@@ -58,12 +58,20 @@ def get_transactions(
 
 def get_transaction_by_id(transaction_id: str) -> Optional[Dict[str, Any]]:
 
-    transaction = df[df["Transaction ID"] == transaction_id]
+    if not transaction_id:
+        return None
+
+    # Normalisation (important avec Excel)
+    df["Transaction ID"] = df["Transaction ID"].astype(str).str.strip()
+    transaction_id = str(transaction_id).strip()
+
+    # Filtrage
+    transaction = df.loc[df["Transaction ID"] == transaction_id]
 
     if transaction.empty:
         return None
 
-    # Convertir la ligne trouvée en dictionnaire
+    # Conversion propre en dictionnaire
     return transaction.iloc[0].to_dict()
 
 
@@ -132,7 +140,7 @@ def get_transaction_types() -> List[str]:
     return sorted(types)
 
 #5. Description : Renvoie les N dernières transactions du dataset (paramètre n , défaut=10)
-def get_last_transactions(n: int = 10) -> list[dict]:
+def get_recent_transactions(n: int = 10) -> list[dict]:
     if n <= 0:
         return []
 
@@ -144,9 +152,9 @@ def get_last_transactions(n: int = 10) -> list[dict]:
         data = data.sort_values(by="Timestamp", ascending=False)
 
     # Sinon, on prend simplement les dernières lignes du fichier
-    last_transactions = data.head(n)
+    recent_transactions = data.head(n)
 
-    return last_transactions.to_dict(orient="records")
+    return recent_transactions.to_dict(orient="records")
 
 
 #6. Suppression d'une transaction fictive (utilisée uniquement en mode test)
@@ -198,55 +206,38 @@ def delete_test_transaction(transaction_id: str) -> Dict:
 
 
 #7. Listes des transactions associées à un client (origine)
-def get_transactions_by_sender(
-    sender_account_id: str,
-    page: int = 1,
-    limit: int = 10
-) -> Dict[str, Any]:
+def get_transactions_by_sender(customer_id: str) -> Dict[str, Any]:
+   
+    #Retourne toutes les transactions envoyées par un customer donné.
 
     # Filtrer par expéditeur
     sender_transactions = df[
-        df["Sender Account ID"] == sender_account_id
+        df["Sender Account ID"] == customer_id
     ]
 
     total = len(sender_transactions)
 
-    # Pagination
-    start = (page - 1) * limit
-    end = start + limit
-    paginated_df = sender_transactions.iloc[start:end]
-
     return {
-        "sender_account_id": sender_account_id,
-        "page": page,
-        "limit": limit,
+        "sender_account_id": customer_id,
         "total": total,
-        "results": paginated_df.to_dict(orient="records")
+        "results": sender_transactions.to_dict(orient="records")
     }
 
 
 #8. Liste des transactions reçues par un client (destination)
 def get_received_transactions(
-    receiver_account_id: str,
-    page: int = 1,
-    limit: int = 10
+    receiver_account_id: str
 ) -> Dict[str, Any]:
-   
+    
     # Filtrer par bénéficiaire
     received_transactions = df[
         df["Receiver Account ID"] == receiver_account_id
     ]
 
     total = len(received_transactions)
-     # Pagination
-    start = (page - 1) * limit
-    end = start + limit
-    paginated_df = received_transactions.iloc[start:end]
 
     return {
         "receiver_account_id": receiver_account_id,
-        "page": page,
-        "limit": limit,
         "total": total,
-        "results": paginated_df.to_dict(orient="records")
+        "results": received_transactions.to_dict(orient="records")
     }
