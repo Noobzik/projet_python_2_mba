@@ -1,5 +1,4 @@
 import pandas as pd
-<<<<<<< HEAD
 from typing import Dict, List, Optional, Union
 from app.config import connexion_dataset
 
@@ -41,12 +40,6 @@ def amount_distribution(
         "bins": labels,
         "counts": counts.tolist()
     }
-=======
-from app.config import connexion_dataset
-# gérer les heures et les dates
-from datetime import datetime
-df=connexion_dataset()
-
 
 def obtenir_stats_journalieres_completes(df, col_timestamp='Timestamp', col_valeur='Transaction Amount'):
   
@@ -144,5 +137,3 @@ def simuler_prediction_fraude(type_trans, amount, old_bal, new_bal):
         "probability": round(probability, 2)
     }
 
-    
->>>>>>> origin/developer

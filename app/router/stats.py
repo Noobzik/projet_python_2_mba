@@ -1,29 +1,23 @@
-<<<<<<< HEAD
+from fastapi import FastAPI, HTTPException,Body
 from fastapi import APIRouter
 from app.services.customers import *
 from app.config import connexion_dataset
 
-router = APIRouter(prefix="/api/customers", tags=["Customers"])
+router_stat = APIRouter(prefix="/api/customers", tags=["Customers"])
 
 # Chargement global du dataset
 df = connexion_dataset()
 
-@router.get("/api/transactions/stats")
+@router_stat.get("/api/transactions/stats")
 def get_stats_by_type():
     return stats_by_type(df)
 
 
-@router.get("/api/transactions/distribution")
+@router_stat.get("/api/transactions/distribution")
 def get_amount_distribution():
 
     return amount_distribution(df)
-=======
-from fastapi import FastAPI, HTTPException,Body
-from pydantic import BaseModel
-from typing import List, Dict, Any
-from app.services.stats import *
-from app.config import connexion_dataset
-from fastapi import APIRouter
+
 
 df=connexion_dataset()
 # Initialisation de l'API
@@ -78,4 +72,4 @@ def predict_fraud(
     resultat = simuler_prediction_fraude(type, amount, oldbalanceOrg, newbalanceOrig)
     
     return resultat
->>>>>>> origin/developer
+
