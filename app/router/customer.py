@@ -19,10 +19,3 @@ def list_customers_route():
 def get_top_customers(n: int = Query(10)):
     return top_customers(df, n=n)
 
-@router_customers.get("/transactions/stats-by-type")
-def get_stats_by_type():
-    return stats_by_type(df)
-
-@router_customers.get("/transactions/amount-distribution")
-def get_amount_distribution():
-    return amount_distribution(df)

@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException,Body
 from fastapi import APIRouter
 from app.services.customers import *
+from app.services.stats import *
 from app.config import connexion_dataset
 
 router_stat = APIRouter(prefix="/api/customers", tags=["Customers"])
@@ -72,4 +73,12 @@ def predict_fraud(
     resultat = simuler_prediction_fraude(type, amount, oldbalanceOrg, newbalanceOrig)
     
     return resultat
+
+@router_stat.get("/api/stats/by-type")
+def get_stats_by_type():
+    return stats_by_type(df)
+
+@router_stat.get("/api/stats/amount-distribution")
+def get_amount_distribution():
+    return amount_distribution(df)     
 
