@@ -62,12 +62,19 @@ def get_stats_by_type() -> List[TypeStats]:
 
 
 @router.get("/daily", response_model=List[DailyStats])
-def get_daily_stats() -> List[DailyStats]:
+def get_daily_stats(
+    limit: int = Query(30, ge=0, le=365, description="Number of days (0 for all)")
+) -> List[DailyStats]:
     """Get statistics grouped by day (step).
+
+    Parameters
+    ----------
+    limit : int
+        Maximum number of days to return (default: 30, 0 for all).
 
     Returns
     -------
     List[DailyStats]
         List of daily statistics including counts and averages.
     """
-    return service.get_daily_stats()
+    return service.get_daily_stats(limit=limit)
