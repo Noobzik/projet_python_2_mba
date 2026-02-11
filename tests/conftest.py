@@ -6,8 +6,8 @@ This module provides shared fixtures for testing.
 import pytest
 import pandas as pd
 from fastapi.testclient import TestClient
-from src.banking_api.app import create_app
-from src.banking_api.utils.data_loader import DataLoader
+from banking_api.app import create_app
+from banking_api.utils.data_loader import DataLoader
 
 
 @pytest.fixture(scope="session")
