@@ -284,6 +284,35 @@ class TransactionsService:
             transactions=transactions
         )
 
+    def get_transactions_to_merchant(
+        self,
+        merchant_id: int
+    ) -> List[Transaction]:
+        """Get transactions received by a merchant.
+
+        This method is used by the to-customer route to show transactions
+        where a merchant received payments (since the dataset only has
+        customer-to-merchant transactions, not customer-to-customer transfers).
+
+        Parameters
+        ----------
+        merchant_id : int
+            Merchant identifier (passed as customer_id in the route).
+
+        Returns
+        -------
+        List[Transaction]
+            List of transactions received by this merchant.
+        """
+        df = self.data_loader.get_data()
+        filtered_df = df[df['merchant_id'] == merchant_id]
+
+        return [
+            Transaction(**self._clean_row(row))
+            for _, row in filtered_df.iterrows()
+        ]
+
+
     def _clean_row(self, row: pd.Series) -> dict:
         """Clean a row for JSON serialization.
 
