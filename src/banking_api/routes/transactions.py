@@ -181,7 +181,6 @@ def get_transactions_to_customer(
     return service.get_transactions_to_merchant(customer_id)
 
 
-
 @router.get("/{id}", response_model=Transaction)
 def get_transaction_by_id(id: str) -> Transaction:
     """Get transaction details by ID.

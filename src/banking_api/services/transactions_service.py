@@ -312,7 +312,6 @@ class TransactionsService:
             for _, row in filtered_df.iterrows()
         ]
 
-
     def _clean_row(self, row: pd.Series) -> dict:
         """Clean a row for JSON serialization.
 
