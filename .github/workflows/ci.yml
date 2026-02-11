@@ -33,6 +33,7 @@ jobs:
     - name: Install type checking dependencies
       run: |
         pip install mypy==1.8.0 types-setuptools==69.0.0.0 pandas-stubs==2.1.4.231227
+        pip install pandas==2.1.4 pydantic==2.5.3 fastapi==0.109.0
     
     - name: Run mypy
       run: |
