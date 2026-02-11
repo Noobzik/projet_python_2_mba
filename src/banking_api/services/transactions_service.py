@@ -3,7 +3,7 @@
 This module provides business logic for transaction operations.
 """
 
-from typing import List, Optional
+from typing import List, Optional, Any, Dict
 import pandas as pd
 from ..models.transaction import Transaction, TransactionList, TransactionSearch
 from ..utils.data_loader import DataLoader
@@ -95,9 +95,13 @@ class TransactionsService:
         for row in records:
             # Ensure we don't return NaNs if any slipped through
             # or if new columns added
-            clean_row = {
-                k: (None if pd.isna(v) else v) for k, v in row.items()
+            clean_row: Dict[str, Any] = {
+                str(k): (None if pd.isna(v) else v) for k, v in row.items()
             }
+            # key "isFraud" needs to be int if present, ensuring type safety
+            if 'isFraud' in clean_row and clean_row['isFraud'] is not None:
+                clean_row['isFraud'] = int(clean_row['isFraud'])
+            
             transactions.append(Transaction(**clean_row))
 
         return TransactionList(
@@ -185,9 +189,11 @@ class TransactionsService:
         records = transactions_df.to_dict('records')
         transactions = []
         for row in records:
-            clean_row = {
-                k: (None if pd.isna(v) else v) for k, v in row.items()
+            clean_row: Dict[str, Any] = {
+                str(k): (None if pd.isna(v) else v) for k, v in row.items()
             }
+            if 'isFraud' in clean_row and clean_row['isFraud'] is not None:
+                clean_row['isFraud'] = int(clean_row['isFraud'])
             transactions.append(Transaction(**clean_row))
 
         return TransactionList(
@@ -233,9 +239,11 @@ class TransactionsService:
         records = recent_df.to_dict('records')
         transactions = []
         for row in records:
-            clean_row = {
-                k: (None if pd.isna(v) else v) for k, v in row.items()
+            clean_row: Dict[str, Any] = {
+                str(k): (None if pd.isna(v) else v) for k, v in row.items()
             }
+            if 'isFraud' in clean_row and clean_row['isFraud'] is not None:
+                clean_row['isFraud'] = int(clean_row['isFraud'])
             transactions.append(Transaction(**clean_row))
 
         return transactions
@@ -333,7 +341,7 @@ class TransactionsService:
             for _, row in filtered_df.iterrows()
         ]
 
-    def _clean_row(self, row: pd.Series) -> dict:
+    def _clean_row(self, row: pd.Series) -> Dict[str, Any]:
         """Clean a row for JSON serialization.
 
         Parameters
@@ -347,7 +355,14 @@ class TransactionsService:
             Cleaned dictionary safe for JSON.
         """
         data = row.to_dict()
+        clean_data: Dict[str, Any] = {}
         for key, value in data.items():
             if pd.isna(value):
-                data[key] = None
-        return data
+                clean_data[str(key)] = None
+            else:
+                clean_data[str(key)] = value
+        
+        if 'isFraud' in clean_data and clean_data['isFraud'] is not None:
+            clean_data['isFraud'] = int(clean_data['isFraud'])
+            
+        return clean_data
