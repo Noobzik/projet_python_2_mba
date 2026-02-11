@@ -161,23 +161,24 @@ def get_transactions_to_customer(
 ) -> List[Transaction]:
     """Get transactions received by a customer.
 
-    Note: This endpoint is not applicable to the Kaggle credit card
-    fraud dataset, as it only contains customer-to-merchant transactions,
-    not customer-to-customer transfers. Returns empty list.
+    Note: Since the Kaggle credit card fraud dataset only contains
+    customer-to-merchant transactions (not customer-to-customer transfers),
+    this endpoint interprets customer_id as merchant_id and returns
+    transactions where the merchant received payments.
 
     Parameters
     ----------
     customer_id : int
-        Customer identifier.
+        Customer identifier (interpreted as merchant_id for this dataset).
 
     Returns
     -------
     List[Transaction]
-        Empty list (not applicable for this dataset).
+        List of transactions received by the merchant.
     """
     # The Kaggle dataset doesn't have customer-to-customer transactions
-    # Only customer-to-merchant transactions exist
-    return []
+    # So we interpret the customer_id as merchant_id to show received payments
+    return service.get_transactions_to_merchant(customer_id)
 
 
 @router.get("/{id}", response_model=Transaction)
