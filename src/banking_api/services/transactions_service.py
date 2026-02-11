@@ -3,7 +3,7 @@
 This module provides business logic for transaction operations.
 """
 
-from typing import List, Optional
+from typing import List, Optional, Any, Dict
 import pandas as pd
 from ..models.transaction import Transaction, TransactionList, TransactionSearch
 from ..utils.data_loader import DataLoader
@@ -53,26 +53,28 @@ class TransactionsService:
         TransactionList
             Paginated list of transactions.
         """
-        df = self.data_loader.get_data().copy()
+        df = self.data_loader.get_data()
 
-        # Parse amount column if it's a string
-        if df['amount'].dtype == 'object':
-            df['amount'] = (
-                df['amount']
-                .str.replace('$', '')
-                .str.replace(',', '')
-                .astype(float)
-            )
-
-        if use_chip_filter:
-            mask = df['use_chip'].str.contains(use_chip_filter, case=False, na=False)
-            df = df[mask]
+        # Apply filters - Numeric/Boolean first for performance
         if is_fraud is not None:
             df = df[df['isFraud'] == is_fraud]
+
         if min_amount is not None:
             df = df[df['amount'] >= min_amount]
+
         if max_amount is not None:
             df = df[df['amount'] <= max_amount]
+
+        # Categorical/String filters
+        if use_chip_filter:
+            # use_chip is categorical, str accessor works but we can optimize
+            # if exact match. For now stick to contains as per feature spec,
+            # it's reasonably fast on categories
+            mask = df['use_chip'].str.contains(
+                use_chip_filter, case=False, na=False
+            )
+            df = df[mask]
+
         if merchant_state:
             df = df[df['merchant_state'] == merchant_state]
 
@@ -81,10 +83,26 @@ class TransactionsService:
         end_idx = start_idx + limit
 
         transactions_df = df.iloc[start_idx:end_idx]
-        transactions = [
-            Transaction(**self._clean_row(row))
-            for _, row in transactions_df.iterrows()
-        ]
+
+        # Optimize iteration by using to_dict('records')
+        # We need to clean the rows (handle NaN) similar to what _clean_row did,
+        # but _clean_row was doing it row by row.
+        # Since we cleaned NaNs in DataLoader, we might be able to use to_dict
+        # directy provided the keys match.
+
+        records = transactions_df.to_dict('records')
+        transactions = []
+        for row in records:
+            # Ensure we don't return NaNs if any slipped through
+            # or if new columns added
+            clean_row: Dict[str, Any] = {
+                str(k): (None if pd.isna(v) else v) for k, v in row.items()
+            }
+            # key "isFraud" needs to be int if present, ensuring type safety
+            if 'isFraud' in clean_row and clean_row['isFraud'] is not None:
+                clean_row['isFraud'] = int(clean_row['isFraud'])
+
+            transactions.append(Transaction(**clean_row))
 
         return TransactionList(
             page=page,
@@ -93,7 +111,10 @@ class TransactionsService:
             transactions=transactions
         )
 
-    def get_transaction_by_id(self, transaction_id: str) -> Optional[Transaction]:
+    def get_transaction_by_id(
+        self,
+        transaction_id: str
+    ) -> Optional[Transaction]:
         """Get a transaction by its ID.
 
         Parameters
@@ -136,16 +157,7 @@ class TransactionsService:
         TransactionList
             Paginated list of matching transactions.
         """
-        df = self.data_loader.get_data().copy()
-
-        # Parse amount if needed
-        if df['amount'].dtype == 'object':
-            df['amount'] = (
-                df['amount']
-                .str.replace('$', '')
-                .str.replace(',', '')
-                .astype(float)
-            )
+        df = self.data_loader.get_data()
 
         if criteria.use_chip:
             mask = df['use_chip'].str.contains(
@@ -173,10 +185,16 @@ class TransactionsService:
         end_idx = start_idx + limit
 
         transactions_df = df.iloc[start_idx:end_idx]
-        transactions = [
-            Transaction(**self._clean_row(row))
-            for _, row in transactions_df.iterrows()
-        ]
+
+        records = transactions_df.to_dict('records')
+        transactions = []
+        for row in records:
+            clean_row: Dict[str, Any] = {
+                str(k): (None if pd.isna(v) else v) for k, v in row.items()
+            }
+            if 'isFraud' in clean_row and clean_row['isFraud'] is not None:
+                clean_row['isFraud'] = int(clean_row['isFraud'])
+            transactions.append(Transaction(**clean_row))
 
         return TransactionList(
             page=page,
@@ -210,14 +228,25 @@ class TransactionsService:
             List of recent transactions.
         """
         df = self.data_loader.get_data()
-        # Sort by date descending
-        df_sorted = df.sort_values('date', ascending=False)
-        recent_df = df_sorted.head(n)
 
-        return [
-            Transaction(**self._clean_row(row))
-            for _, row in recent_df.iterrows()
-        ]
+        # Optimized: O(1) assuming DF is sorted by date in DataLoader (ascending)
+        # Take the last n rows and reverse them to show most recent first
+        if len(df) >= n:
+            recent_df = df.iloc[-n:][::-1]
+        else:
+            recent_df = df.iloc[::-1]
+
+        records = recent_df.to_dict('records')
+        transactions = []
+        for row in records:
+            clean_row: Dict[str, Any] = {
+                str(k): (None if pd.isna(v) else v) for k, v in row.items()
+            }
+            if 'isFraud' in clean_row and clean_row['isFraud'] is not None:
+                clean_row['isFraud'] = int(clean_row['isFraud'])
+            transactions.append(Transaction(**clean_row))
+
+        return transactions
 
     def delete_transaction(self, transaction_id: str) -> bool:
         """Delete a transaction (test mode only).
@@ -312,7 +341,7 @@ class TransactionsService:
             for _, row in filtered_df.iterrows()
         ]
 
-    def _clean_row(self, row: pd.Series) -> dict:
+    def _clean_row(self, row: pd.Series) -> Dict[str, Any]:
         """Clean a row for JSON serialization.
 
         Parameters
@@ -326,7 +355,14 @@ class TransactionsService:
             Cleaned dictionary safe for JSON.
         """
         data = row.to_dict()
+        clean_data: Dict[str, Any] = {}
         for key, value in data.items():
             if pd.isna(value):
-                data[key] = None
-        return data
+                clean_data[str(key)] = None
+            else:
+                clean_data[str(key)] = value
+
+        if 'isFraud' in clean_data and clean_data['isFraud'] is not None:
+            clean_data['isFraud'] = int(clean_data['isFraud'])
+
+        return clean_data

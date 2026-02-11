@@ -34,16 +34,7 @@ class StatsService:
         StatsOverview
             Overall statistics including totals, averages, and fraud rate.
         """
-        df = self.data_loader.get_data().copy()
-
-        # Parse amount if needed
-        if df['amount'].dtype == 'object':
-            df['amount'] = (
-                df['amount']
-                .str.replace('$', '')
-                .str.replace(',', '')
-                .astype(float)
-            )
+        df = self.data_loader.get_data()
 
         total_transactions = len(df)
         fraud_count = df['isFraud'].sum()
@@ -75,16 +66,7 @@ class StatsService:
         AmountDistribution
             Distribution of amounts across bins.
         """
-        df = self.data_loader.get_data().copy()
-
-        # Parse amount if needed
-        if df['amount'].dtype == 'object':
-            df['amount'] = (
-                df['amount']
-                .str.replace('$', '')
-                .str.replace(',', '')
-                .astype(float)
-            )
+        df = self.data_loader.get_data()
 
         counts, bin_edges = np.histogram(df['amount'], bins=num_bins)
 
@@ -108,16 +90,6 @@ class StatsService:
         """
         df = self.data_loader.get_data()
 
-        # Parse amount if needed
-        if df['amount'].dtype == 'object':
-            df = df.copy()
-            df['amount'] = (
-                df['amount']
-                .str.replace('$', '')
-                .str.replace(',', '')
-                .astype(float)
-            )
-
         # Use vectorized groupby for better performance
         grouped = df.groupby('use_chip', dropna=True).agg({
             'amount': ['mean', 'sum', 'count'],
@@ -129,6 +101,7 @@ class StatsService:
         ])
 
         type_stats = []
+        # iterrows is okay here because number of types is very small
         for _, row in grouped.iterrows():
             avg_amount = row['avg_amount'] if not pd.isna(row['avg_amount']) else 0.0
             total_amount = (
@@ -164,23 +137,16 @@ class StatsService:
         """
         df = self.data_loader.get_data()
 
-        # Parse amount if needed
-        if df['amount'].dtype == 'object':
-            df = df.copy()
-            df['amount'] = (
-                df['amount']
-                .str.replace('$', '')
-                .str.replace(',', '')
-                .astype(float)
-            )
-        else:
-            df = df.copy()
+        # Create a copy to avoid modifying the cached dataframe
+        df = df.copy()
 
-        # Convert date to datetime and extract date only
-        df['date_only'] = pd.to_datetime(df['date']).dt.date
+        # Ensure we have date parsed. If not, try to parse
+        if df['date'].dtype == 'object':
+            df['date'] = pd.to_datetime(df['date'])
 
-        # Use vectorized groupby for better performance
-        grouped = df.groupby('date_only').agg({
+        # Group by date using pd.Grouper for better performance
+        # Resample by Day ('D')
+        grouped = df.groupby(pd.Grouper(key='date', freq='D')).agg({
             'amount': ['mean', 'sum', 'count'],
             'isFraud': 'sum'
         }).reset_index()
@@ -188,6 +154,10 @@ class StatsService:
         grouped.columns = pd.Index([
             'date', 'avg_amount', 'total_amount', 'count', 'fraud_count'
         ])
+
+        # Filter out empty days (count == 0) if any
+        grouped = grouped[grouped['count'] > 0]
+
         grouped = grouped.sort_values('date')
 
         # Apply limit if specified
@@ -203,8 +173,11 @@ class StatsService:
                 row['total_amount'] if not pd.isna(row['total_amount']) else 0.0
             )
 
+            # date is now Timestamp, convert to string
+            step_str = row['date'].strftime('%Y-%m-%d')
+
             daily_stats.append(DailyStats(
-                step=str(row['date']),
+                step=step_str,
                 count=int(row['count']),
                 avg_amount=float(avg_amount),
                 total_amount=float(total_amount),

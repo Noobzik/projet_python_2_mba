@@ -74,6 +74,7 @@ dmypy.json
 # Data files (as per project requirements)
 data/*.json
 data/*.csv
+data/*.pkl
 *.csv
 
 # Environment variables

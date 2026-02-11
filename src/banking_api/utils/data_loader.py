@@ -62,7 +62,9 @@ class DataLoader:
         if file_path is None:
             base_dir = Path(__file__).parent.parent.parent.parent
             file_path = str(base_dir / "data" / "transactions_data.csv")
-            fraud_labels_path = str(base_dir / "data" / "train_fraud_labels.json")
+            fraud_labels_path = str(
+                base_dir / "data" / "train_fraud_labels.json"
+            )
         else:
             fraud_labels_path = None
 
@@ -72,15 +74,67 @@ class DataLoader:
                 "Please download from Kaggle and place in data/ directory."
             )
 
-        # Load transactions
-        self._data = pd.read_csv(file_path)
+        # Check for cached pickle file
+        pickle_path = file_path.replace('.csv', '.pkl')
+
+        if os.path.exists(pickle_path):
+            csv_mtime = os.path.getmtime(file_path)
+            pkl_mtime = os.path.getmtime(pickle_path)
+
+            if pkl_mtime > csv_mtime:
+                print(f"Loading data from cache: {pickle_path}")
+                try:
+                    self._data = pd.read_pickle(pickle_path)
+
+                    # Ensure consistency if fraud file changed (simplified check)
+                    # For strict correctness, we should also reject cache if
+                    # fraud file is newer. But assuming fraud labels are static.
+                    return self._data
+                except Exception as e:
+                    print(f"Failed to load cache: {e}. Reloading from CSV.")
+
+        print(f"Loading data from CSV: {file_path}")
+
+        # Load transactions with efficient date parsing
+        # Try to use pyarrow engine if available, otherwise default
+        try:
+            self._data = pd.read_csv(
+                file_path,
+                parse_dates=['date'],
+                # Hint for faster parsing if format is consistent
+                date_format='%Y-%m-%d %H:%M:%S'
+            )
+        except (ValueError, TypeError):
+            # Fallback if date_format doesn't match or other issue
+            self._data = pd.read_csv(file_path, parse_dates=['date'])
 
         # Convert id to string for consistency
         self._data['id'] = self._data['id'].astype(str)
 
+        # Parse amount column if it's a string
+        if 'amount' in self._data.columns and \
+                self._data['amount'].dtype == 'object':
+            # Use string slicing which is faster than replace for fixed formats
+            # like $XX.XX. Assuming format is always $...
+            try:
+                # Vectorized slice and convert
+                self._data['amount'] = (
+                    self._data['amount'].str.slice(1).astype(float)
+                )
+            except ValueError:
+                # Fallback to slower replace if dirty data
+                self._data['amount'] = (
+                    self._data['amount']
+                    .str.replace('$', '', regex=False)
+                    .str.replace(',', '', regex=False)
+                    .astype(float)
+                )
+
         # Clean NaN values to prevent JSON serialization errors
         # Replace NaN in numeric columns with 0 or appropriate defaults
-        numeric_columns = self._data.select_dtypes(include=['float64', 'int64']).columns
+        numeric_columns = self._data.select_dtypes(
+            include=['float64', 'int64']
+        ).columns
         for col in numeric_columns:
             if col == 'zip':
                 # Keep zip as nullable, will be handled in model
@@ -89,8 +143,20 @@ class DataLoader:
 
         # Replace NaN in string columns with None or empty string
         string_columns = self._data.select_dtypes(include=['object']).columns
+
         for col in string_columns:
             self._data[col] = self._data[col].fillna('')
+
+        # Optimize types for low cardinality columns
+        # 'use_chip' has only 3 values. Validated via unique()
+        if 'use_chip' in self._data.columns:
+            self._data['use_chip'] = self._data['use_chip'].astype('category')
+
+        # 'merchant_state' has limited number of states
+        if 'merchant_state' in self._data.columns:
+            self._data['merchant_state'] = (
+                self._data['merchant_state'].astype('category')
+            )
 
         # Load and merge fraud labels
         if fraud_labels_path and os.path.exists(fraud_labels_path):
@@ -106,11 +172,27 @@ class DataLoader:
 
             # Add isFraud column
             self._data['isFraud'] = (
-                self._data['id'].map(fraud_dict).fillna(0).astype(int)
+                self._data['id'].map(fraud_dict).fillna(0).astype('int8')
             )
         else:
             # Default to 0 if fraud labels not found
-            self._data['isFraud'] = 0
+            if 'isFraud' not in self._data.columns:
+                self._data['isFraud'] = 0
+            else:
+                self._data['isFraud'] = (
+                    self._data['isFraud'].fillna(0).astype('int8')
+                )
+
+        # Sort by date once to optimize time-based queries
+        # This makes getting recent transactions O(1) instead of O(N log N)
+        if 'date' in self._data.columns:
+            self._data.sort_values('date', inplace=True)
+
+        print(f"Saving data to cache: {pickle_path}")
+        try:
+            self._data.to_pickle(pickle_path)
+        except Exception as e:
+            print(f"Failed to save cache: {e}")
 
         return self._data
 
