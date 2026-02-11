@@ -6,8 +6,8 @@ This module provides integration tests for API features.
 import unittest
 from fastapi.testclient import TestClient
 import pandas as pd
-from src.banking_api.app import create_app
-from src.banking_api.utils.data_loader import DataLoader
+from banking_api.app import create_app
+from banking_api.utils.data_loader import DataLoader
 
 
 class TestAPIFeatures(unittest.TestCase):
