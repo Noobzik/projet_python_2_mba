@@ -78,7 +78,12 @@ class CustomerService:
 
         # Parse amount if needed
         if customer_df['amount'].dtype == 'object':
-            amounts = customer_df['amount'].str.replace('$', '').str.replace(',', '').astype(float)
+            amounts = (
+                customer_df['amount']
+                .str.replace('$', '')
+                .str.replace(',', '')
+                .astype(float)
+            )
         else:
             amounts = customer_df['amount']
 
@@ -121,7 +126,12 @@ class CustomerService:
         # Parse amount if needed
         if df['amount'].dtype == 'object':
             df = df.copy()
-            df['amount'] = df['amount'].str.replace('$', '').str.replace(',', '').astype(float)
+            df['amount'] = (
+                df['amount']
+                .str.replace('$', '')
+                .str.replace(',', '')
+                .astype(float)
+            )
 
         customer_totals = df.groupby('client_id').agg({
             'amount': ['sum', 'count']

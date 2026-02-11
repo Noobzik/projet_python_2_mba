@@ -3,7 +3,7 @@
 This module provides business logic for statistical operations.
 """
 
-from typing import List, Dict, Any
+from typing import List
 import pandas as pd
 import numpy as np
 from ..models.stats import (
@@ -38,7 +38,12 @@ class StatsService:
 
         # Parse amount if needed
         if df['amount'].dtype == 'object':
-            df['amount'] = df['amount'].str.replace('$', '').str.replace(',', '').astype(float)
+            df['amount'] = (
+                df['amount']
+                .str.replace('$', '')
+                .str.replace(',', '')
+                .astype(float)
+            )
 
         total_transactions = len(df)
         fraud_count = df['isFraud'].sum()
@@ -74,7 +79,12 @@ class StatsService:
 
         # Parse amount if needed
         if df['amount'].dtype == 'object':
-            df['amount'] = df['amount'].str.replace('$', '').str.replace(',', '').astype(float)
+            df['amount'] = (
+                df['amount']
+                .str.replace('$', '')
+                .str.replace(',', '')
+                .astype(float)
+            )
 
         counts, bin_edges = np.histogram(df['amount'], bins=num_bins)
 
@@ -101,7 +111,12 @@ class StatsService:
         # Parse amount if needed
         if df['amount'].dtype == 'object':
             df = df.copy()
-            df['amount'] = df['amount'].str.replace('$', '').str.replace(',', '').astype(float)
+            df['amount'] = (
+                df['amount']
+                .str.replace('$', '')
+                .str.replace(',', '')
+                .astype(float)
+            )
 
         # Use vectorized groupby for better performance
         grouped = df.groupby('use_chip', dropna=True).agg({
@@ -114,14 +129,19 @@ class StatsService:
         type_stats = []
         for _, row in grouped.iterrows():
             avg_amount = row['avg_amount'] if not pd.isna(row['avg_amount']) else 0.0
-            total_amount = row['total_amount'] if not pd.isna(row['total_amount']) else 0.0
+            total_amount = (
+                row['total_amount'] if not pd.isna(row['total_amount']) else 0.0
+            )
 
             type_stats.append(TypeStats(
                 type=str(row['type']),
                 count=int(row['count']),
                 avg_amount=float(avg_amount),
                 total_amount=float(total_amount),
-                fraud_rate=float(row['fraud_count'] / row['count']) if row['count'] > 0 else 0.0
+                fraud_rate=(
+                    float(row['fraud_count'] / row['count'])
+                    if row['count'] > 0 else 0.0
+                )
             ))
 
         return sorted(type_stats, key=lambda x: x.count, reverse=True)
@@ -145,7 +165,12 @@ class StatsService:
         # Parse amount if needed
         if df['amount'].dtype == 'object':
             df = df.copy()
-            df['amount'] = df['amount'].str.replace('$', '').str.replace(',', '').astype(float)
+            df['amount'] = (
+                df['amount']
+                .str.replace('$', '')
+                .str.replace(',', '')
+                .astype(float)
+            )
         else:
             df = df.copy()
 
@@ -167,8 +192,12 @@ class StatsService:
 
         daily_stats = []
         for _, row in grouped.iterrows():
-            avg_amount = row['avg_amount'] if not pd.isna(row['avg_amount']) else 0.0
-            total_amount = row['total_amount'] if not pd.isna(row['total_amount']) else 0.0
+            avg_amount = (
+                row['avg_amount'] if not pd.isna(row['avg_amount']) else 0.0
+            )
+            total_amount = (
+                row['total_amount'] if not pd.isna(row['total_amount']) else 0.0
+            )
 
             daily_stats.append(DailyStats(
                 step=str(row['date']),

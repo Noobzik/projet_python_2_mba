@@ -3,7 +3,7 @@
 This module provides business logic for transaction operations.
 """
 
-from typing import List, Optional, Dict, Any
+from typing import List, Optional
 import pandas as pd
 from ..models.transaction import Transaction, TransactionList, TransactionSearch
 from ..utils.data_loader import DataLoader
@@ -57,10 +57,16 @@ class TransactionsService:
 
         # Parse amount column if it's a string
         if df['amount'].dtype == 'object':
-            df['amount'] = df['amount'].str.replace('$', '').str.replace(',', '').astype(float)
+            df['amount'] = (
+                df['amount']
+                .str.replace('$', '')
+                .str.replace(',', '')
+                .astype(float)
+            )
 
         if use_chip_filter:
-            df = df[df['use_chip'].str.contains(use_chip_filter, case=False, na=False)]
+            mask = df['use_chip'].str.contains(use_chip_filter, case=False, na=False)
+            df = df[mask]
         if is_fraud is not None:
             df = df[df['isFraud'] == is_fraud]
         if min_amount is not None:
@@ -134,10 +140,20 @@ class TransactionsService:
 
         # Parse amount if needed
         if df['amount'].dtype == 'object':
-            df['amount'] = df['amount'].str.replace('$', '').str.replace(',', '').astype(float)
+            df['amount'] = (
+                df['amount']
+                .str.replace('$', '')
+                .str.replace(',', '')
+                .astype(float)
+            )
 
         if criteria.use_chip:
-            df = df[df['use_chip'].str.contains(criteria.use_chip, case=False, na=False)]
+            mask = df['use_chip'].str.contains(
+                criteria.use_chip,
+                case=False,
+                na=False
+            )
+            df = df[mask]
         if criteria.isFraud is not None:
             df = df[df['isFraud'] == criteria.isFraud]
         if criteria.amount_range:

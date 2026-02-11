@@ -105,7 +105,9 @@ class DataLoader:
             }
 
             # Add isFraud column
-            self._data['isFraud'] = self._data['id'].map(fraud_dict).fillna(0).astype(int)
+            self._data['isFraud'] = (
+                self._data['id'].map(fraud_dict).fillna(0).astype(int)
+            )
         else:
             # Default to 0 if fraud labels not found
             self._data['isFraud'] = 0
