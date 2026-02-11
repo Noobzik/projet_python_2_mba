@@ -80,7 +80,7 @@ class FraudDetectionService:
             'isFraud': ['sum', 'count']
         }).reset_index()
 
-        grouped.columns = ['type', 'fraud_count', 'total_count']
+        grouped.columns = pd.Index(['type', 'fraud_count', 'total_count'])
 
         fraud_stats = []
         for _, row in grouped.iterrows():

@@ -137,7 +137,7 @@ class CustomerService:
             'amount': ['sum', 'count']
         }).reset_index()
 
-        customer_totals.columns = ['id', 'total_amount', 'transactions_count']
+        customer_totals.columns = pd.Index(['id', 'total_amount', 'transactions_count'])
         customer_totals = customer_totals.sort_values(
             'total_amount',
             ascending=False

@@ -124,7 +124,9 @@ class StatsService:
             'isFraud': 'sum'
         }).reset_index()
 
-        grouped.columns = ['type', 'avg_amount', 'total_amount', 'count', 'fraud_count']
+        grouped.columns = pd.Index([
+            'type', 'avg_amount', 'total_amount', 'count', 'fraud_count'
+        ])
 
         type_stats = []
         for _, row in grouped.iterrows():
@@ -183,7 +185,9 @@ class StatsService:
             'isFraud': 'sum'
         }).reset_index()
 
-        grouped.columns = ['date', 'avg_amount', 'total_amount', 'count', 'fraud_count']
+        grouped.columns = pd.Index([
+            'date', 'avg_amount', 'total_amount', 'count', 'fraud_count'
+        ])
         grouped = grouped.sort_values('date')
 
         # Apply limit if specified

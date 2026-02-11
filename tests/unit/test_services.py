@@ -3,8 +3,6 @@
 This module tests business logic in service classes.
 """
 
-import pytest
-import pandas as pd
 from banking_api.services.transactions_service import TransactionsService
 from banking_api.services.stats_service import StatsService
 from banking_api.services.fraud_detection_service import FraudDetectionService
