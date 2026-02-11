@@ -137,13 +137,12 @@ class StatsService:
         """
         df = self.data_loader.get_data()
 
+        # Create a copy to avoid modifying the cached dataframe
+        df = df.copy()
+
         # Ensure we have date parsed. If not, try to parse
         if df['date'].dtype == 'object':
-             # This should not happen if DataLoader did its job, 
-             # but to be safe and avoid modifying original df
-             date_series = pd.to_datetime(df['date'])
-        else:
-             date_series = df['date']
+            df['date'] = pd.to_datetime(df['date'])
 
         # Group by date using pd.Grouper for better performance
         # Resample by Day ('D')
@@ -155,10 +154,10 @@ class StatsService:
         grouped.columns = pd.Index([
             'date', 'avg_amount', 'total_amount', 'count', 'fraud_count'
         ])
-        
-        # Filter out empty days (count == 0) if any, though groupby freq might include them
+
+        # Filter out empty days (count == 0) if any
         grouped = grouped[grouped['count'] > 0]
-        
+
         grouped = grouped.sort_values('date')
 
         # Apply limit if specified

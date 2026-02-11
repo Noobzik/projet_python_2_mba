@@ -58,20 +58,23 @@ class TransactionsService:
         # Apply filters - Numeric/Boolean first for performance
         if is_fraud is not None:
             df = df[df['isFraud'] == is_fraud]
-            
+
         if min_amount is not None:
             df = df[df['amount'] >= min_amount]
-            
+
         if max_amount is not None:
             df = df[df['amount'] <= max_amount]
 
         # Categorical/String filters
         if use_chip_filter:
-            # use_chip is categorical, str accessor works but we can optimize if exact match
-            # For now stick to contains as per feature spec, it's reasonably fast on categories
-            mask = df['use_chip'].str.contains(use_chip_filter, case=False, na=False)
+            # use_chip is categorical, str accessor works but we can optimize
+            # if exact match. For now stick to contains as per feature spec,
+            # it's reasonably fast on categories
+            mask = df['use_chip'].str.contains(
+                use_chip_filter, case=False, na=False
+            )
             df = df[mask]
-            
+
         if merchant_state:
             df = df[df['merchant_state'] == merchant_state]
 
@@ -80,19 +83,22 @@ class TransactionsService:
         end_idx = start_idx + limit
 
         transactions_df = df.iloc[start_idx:end_idx]
-        
+
         # Optimize iteration by using to_dict('records')
-        # We need to clean the rows (handle NaN) similar to what _clean_row did, 
+        # We need to clean the rows (handle NaN) similar to what _clean_row did,
         # but _clean_row was doing it row by row.
-        # Since we cleaned NaNs in DataLoader, we might be able to use to_dict directy
-        # provided the keys match.
-        
+        # Since we cleaned NaNs in DataLoader, we might be able to use to_dict
+        # directy provided the keys match.
+
         records = transactions_df.to_dict('records')
         transactions = []
         for row in records:
-             # Ensure we don't return NaNs if any slipped through or if new columns added
-             clean_row = {k: (None if pd.isna(v) else v) for k, v in row.items()}
-             transactions.append(Transaction(**clean_row))
+            # Ensure we don't return NaNs if any slipped through
+            # or if new columns added
+            clean_row = {
+                k: (None if pd.isna(v) else v) for k, v in row.items()
+            }
+            transactions.append(Transaction(**clean_row))
 
         return TransactionList(
             page=page,
@@ -101,7 +107,10 @@ class TransactionsService:
             transactions=transactions
         )
 
-    def get_transaction_by_id(self, transaction_id: str) -> Optional[Transaction]:
+    def get_transaction_by_id(
+        self,
+        transaction_id: str
+    ) -> Optional[Transaction]:
         """Get a transaction by its ID.
 
         Parameters
@@ -172,12 +181,14 @@ class TransactionsService:
         end_idx = start_idx + limit
 
         transactions_df = df.iloc[start_idx:end_idx]
-        
+
         records = transactions_df.to_dict('records')
         transactions = []
         for row in records:
-             clean_row = {k: (None if pd.isna(v) else v) for k, v in row.items()}
-             transactions.append(Transaction(**clean_row))
+            clean_row = {
+                k: (None if pd.isna(v) else v) for k, v in row.items()
+            }
+            transactions.append(Transaction(**clean_row))
 
         return TransactionList(
             page=page,
@@ -211,7 +222,7 @@ class TransactionsService:
             List of recent transactions.
         """
         df = self.data_loader.get_data()
-        
+
         # Optimized: O(1) assuming DF is sorted by date in DataLoader (ascending)
         # Take the last n rows and reverse them to show most recent first
         if len(df) >= n:
@@ -222,8 +233,10 @@ class TransactionsService:
         records = recent_df.to_dict('records')
         transactions = []
         for row in records:
-             clean_row = {k: (None if pd.isna(v) else v) for k, v in row.items()}
-             transactions.append(Transaction(**clean_row))
+            clean_row = {
+                k: (None if pd.isna(v) else v) for k, v in row.items()
+            }
+            transactions.append(Transaction(**clean_row))
 
         return transactions
 
