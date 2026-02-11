@@ -101,7 +101,7 @@ class TransactionsService:
             # key "isFraud" needs to be int if present, ensuring type safety
             if 'isFraud' in clean_row and clean_row['isFraud'] is not None:
                 clean_row['isFraud'] = int(clean_row['isFraud'])
-            
+
             transactions.append(Transaction(**clean_row))
 
         return TransactionList(
@@ -361,8 +361,8 @@ class TransactionsService:
                 clean_data[str(key)] = None
             else:
                 clean_data[str(key)] = value
-        
+
         if 'isFraud' in clean_data and clean_data['isFraud'] is not None:
             clean_data['isFraud'] = int(clean_data['isFraud'])
-            
+
         return clean_data
