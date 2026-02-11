@@ -48,10 +48,10 @@ def test_get_customer_profile(client: TestClient) -> None:
     client : TestClient
         FastAPI test client.
     """
-    response = client.get("/api/customers/C1231006815")
+    response = client.get("/api/customers/1556")
     assert response.status_code == 200
     data = response.json()
-    assert data["id"] == "C1231006815"
+    assert data["id"] == 1556
     assert "transactions_count" in data
     assert "avg_amount" in data
     assert "fraudulent" in data
@@ -65,7 +65,7 @@ def test_get_customer_profile_not_found(client: TestClient) -> None:
     client : TestClient
         FastAPI test client.
     """
-    response = client.get("/api/customers/INVALID_CUSTOMER")
+    response = client.get("/api/customers/99999")
     assert response.status_code == 404
 
 

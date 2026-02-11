@@ -54,10 +54,10 @@ def test_predict_fraud_low_risk(client: TestClient) -> None:
         FastAPI test client.
     """
     transaction = {
-        "type": "PAYMENT",
         "amount": 100.0,
-        "oldbalanceOrg": 1000.0,
-        "newbalanceOrig": 900.0
+        "use_chip": "Chip Transaction",
+        "merchant_state": "ND",
+        "mcc": 5411
     }
     response = client.post("/api/fraud/predict", json=transaction)
     assert response.status_code == 200
@@ -77,12 +77,10 @@ def test_predict_fraud_high_risk(client: TestClient) -> None:
         FastAPI test client.
     """
     transaction = {
-        "type": "TRANSFER",
         "amount": 500000.0,
-        "oldbalanceOrg": 600000.0,
-        "newbalanceOrig": 100000.0,
-        "oldbalanceDest": 0.0,
-        "newbalanceDest": 0.0
+        "use_chip": "Online Transaction",
+        "merchant_state": "CA",
+        "mcc": 5999
     }
     response = client.post("/api/fraud/predict", json=transaction)
     assert response.status_code == 200
