@@ -78,6 +78,20 @@ class DataLoader:
         # Convert id to string for consistency
         self._data['id'] = self._data['id'].astype(str)
 
+        # Clean NaN values to prevent JSON serialization errors
+        # Replace NaN in numeric columns with 0 or appropriate defaults
+        numeric_columns = self._data.select_dtypes(include=['float64', 'int64']).columns
+        for col in numeric_columns:
+            if col == 'zip':
+                # Keep zip as nullable, will be handled in model
+                continue
+            self._data[col] = self._data[col].fillna(0)
+
+        # Replace NaN in string columns with None or empty string
+        string_columns = self._data.select_dtypes(include=['object']).columns
+        for col in string_columns:
+            self._data[col] = self._data[col].fillna('')
+
         # Load and merge fraud labels
         if fraud_labels_path and os.path.exists(fraud_labels_path):
             import json

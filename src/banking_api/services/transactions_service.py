@@ -76,7 +76,7 @@ class TransactionsService:
 
         transactions_df = df.iloc[start_idx:end_idx]
         transactions = [
-            Transaction(**row.to_dict())
+            Transaction(**self._clean_row(row))
             for _, row in transactions_df.iterrows()
         ]
 
@@ -106,7 +106,7 @@ class TransactionsService:
         if transaction_df.empty:
             return None
 
-        return Transaction(**transaction_df.iloc[0].to_dict())
+        return Transaction(**self._clean_row(transaction_df.iloc[0]))
 
     def search_transactions(
         self,
@@ -158,7 +158,7 @@ class TransactionsService:
 
         transactions_df = df.iloc[start_idx:end_idx]
         transactions = [
-            Transaction(**row.to_dict())
+            Transaction(**self._clean_row(row))
             for _, row in transactions_df.iterrows()
         ]
 
@@ -199,7 +199,7 @@ class TransactionsService:
         recent_df = df_sorted.head(n)
 
         return [
-            Transaction(**row.to_dict())
+            Transaction(**self._clean_row(row))
             for _, row in recent_df.iterrows()
         ]
 
@@ -226,23 +226,63 @@ class TransactionsService:
             return True
         return False
 
-    def get_transactions_by_client(self, client_id: int) -> List[Transaction]:
-        """Get transactions for a specific client.
+    def get_transactions_by_client(
+        self,
+        client_id: int,
+        page: int = 1,
+        limit: int = 50
+    ) -> TransactionList:
+        """Get paginated transactions for a specific client.
 
         Parameters
         ----------
         client_id : int
             Client identifier.
+        page : int
+            Page number (1-indexed).
+        limit : int
+            Number of items per page.
 
         Returns
         -------
-        List[Transaction]
-            List of transactions.
+        TransactionList
+            Paginated list of transactions for this client.
         """
         df = self.data_loader.get_data()
         filtered_df = df[df['client_id'] == client_id]
 
-        return [
-            Transaction(**row.to_dict())
-            for _, row in filtered_df.iterrows()
+        total = len(filtered_df)
+        start_idx = (page - 1) * limit
+        end_idx = start_idx + limit
+
+        transactions_df = filtered_df.iloc[start_idx:end_idx]
+        transactions = [
+            Transaction(**self._clean_row(row))
+            for _, row in transactions_df.iterrows()
         ]
+
+        return TransactionList(
+            page=page,
+            limit=limit,
+            total=total,
+            transactions=transactions
+        )
+
+    def _clean_row(self, row: pd.Series) -> dict:
+        """Clean a row for JSON serialization.
+
+        Parameters
+        ----------
+        row : pd.Series
+            DataFrame row.
+
+        Returns
+        -------
+        dict
+            Cleaned dictionary safe for JSON.
+        """
+        data = row.to_dict()
+        for key, value in data.items():
+            if pd.isna(value):
+                data[key] = None
+        return data

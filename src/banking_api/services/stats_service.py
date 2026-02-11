@@ -96,55 +96,86 @@ class StatsService:
         List[TypeStats]
             List of statistics for each transaction method.
         """
-        df = self.data_loader.get_data().copy()
+        df = self.data_loader.get_data()
 
         # Parse amount if needed
         if df['amount'].dtype == 'object':
+            df = df.copy()
             df['amount'] = df['amount'].str.replace('$', '').str.replace(',', '').astype(float)
 
+        # Use vectorized groupby for better performance
+        grouped = df.groupby('use_chip', dropna=True).agg({
+            'amount': ['mean', 'sum', 'count'],
+            'isFraud': 'sum'
+        }).reset_index()
+
+        grouped.columns = ['type', 'avg_amount', 'total_amount', 'count', 'fraud_count']
+
         type_stats = []
-        for trans_type in df['use_chip'].dropna().unique():
-            type_df = df[df['use_chip'] == trans_type]
-            fraud_count = type_df['isFraud'].sum()
-            total_count = len(type_df)
+        for _, row in grouped.iterrows():
+            avg_amount = row['avg_amount'] if not pd.isna(row['avg_amount']) else 0.0
+            total_amount = row['total_amount'] if not pd.isna(row['total_amount']) else 0.0
 
             type_stats.append(TypeStats(
-                type=str(trans_type),
-                count=total_count,
-                avg_amount=float(type_df['amount'].mean()),
-                total_amount=float(type_df['amount'].sum()),
-                fraud_rate=fraud_count / total_count if total_count > 0 else 0
+                type=str(row['type']),
+                count=int(row['count']),
+                avg_amount=float(avg_amount),
+                total_amount=float(total_amount),
+                fraud_rate=float(row['fraud_count'] / row['count']) if row['count'] > 0 else 0.0
             ))
 
         return sorted(type_stats, key=lambda x: x.count, reverse=True)
 
-    def get_daily_stats(self) -> List[DailyStats]:
+    def get_daily_stats(self, limit: int = 30) -> List[DailyStats]:
         """Get statistics grouped by date.
+
+        Parameters
+        ----------
+        limit : int
+            Maximum number of daily stats to return (default: 30).
+            Use 0 for all days.
 
         Returns
         -------
         List[DailyStats]
             List of daily statistics.
         """
-        df = self.data_loader.get_data().copy()
+        df = self.data_loader.get_data()
 
         # Parse amount if needed
         if df['amount'].dtype == 'object':
+            df = df.copy()
             df['amount'] = df['amount'].str.replace('$', '').str.replace(',', '').astype(float)
+        else:
+            df = df.copy()
 
         # Convert date to datetime and extract date only
         df['date_only'] = pd.to_datetime(df['date']).dt.date
 
+        # Use vectorized groupby for better performance
+        grouped = df.groupby('date_only').agg({
+            'amount': ['mean', 'sum', 'count'],
+            'isFraud': 'sum'
+        }).reset_index()
+
+        grouped.columns = ['date', 'avg_amount', 'total_amount', 'count', 'fraud_count']
+        grouped = grouped.sort_values('date')
+
+        # Apply limit if specified
+        if limit > 0:
+            grouped = grouped.tail(limit)
+
         daily_stats = []
-        for date in sorted(df['date_only'].unique()):
-            date_df = df[df['date_only'] == date]
+        for _, row in grouped.iterrows():
+            avg_amount = row['avg_amount'] if not pd.isna(row['avg_amount']) else 0.0
+            total_amount = row['total_amount'] if not pd.isna(row['total_amount']) else 0.0
 
             daily_stats.append(DailyStats(
-                step=str(date),  # Using date as step
-                count=len(date_df),
-                avg_amount=float(date_df['amount'].mean()),
-                total_amount=float(date_df['amount'].sum()),
-                fraud_count=int(date_df['isFraud'].sum())
+                step=str(row['date']),
+                count=int(row['count']),
+                avg_amount=float(avg_amount),
+                total_amount=float(total_amount),
+                fraud_count=int(row['fraud_count'])
             ))
 
         return daily_stats

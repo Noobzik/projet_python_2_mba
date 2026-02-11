@@ -72,6 +72,7 @@ dmypy.json
 .pyre/
 
 # Data files (as per project requirements)
+data/*.json
 data/*.csv
 *.csv
 
