@@ -32,11 +32,11 @@ def test_get_transactions_with_filters(client: TestClient) -> None:
     client : TestClient
         FastAPI test client.
     """
-    response = client.get("/api/transactions?type=PAYMENT")
+    response = client.get("/api/transactions?use_chip=Chip")
     assert response.status_code == 200
     data = response.json()
     for tx in data["transactions"]:
-        assert tx["type"] == "PAYMENT"
+        assert "Chip" in tx["use_chip"]
 
 
 def test_get_transactions_fraud_filter(client: TestClient) -> None:
@@ -89,7 +89,7 @@ def test_search_transactions(client: TestClient) -> None:
         FastAPI test client.
     """
     search_criteria = {
-        "type": "PAYMENT",
+        "use_chip": "Swipe",
         "isFraud": 0
     }
     response = client.post("/api/transactions/search", json=search_criteria)
@@ -180,12 +180,12 @@ def test_get_transactions_by_customer(client: TestClient) -> None:
     client : TestClient
         FastAPI test client.
     """
-    response = client.get("/api/transactions/by-customer/C1231006815")
+    response = client.get("/api/transactions/by-customer/1556")
     assert response.status_code == 200
     data = response.json()
-    assert isinstance(data, list)
-    for tx in data:
-        assert tx["nameOrig"] == "C1231006815"
+    assert "transactions" in data
+    for tx in data["transactions"]:
+        assert tx["client_id"] == 1556
 
 
 def test_get_transactions_to_customer(client: TestClient) -> None:
@@ -196,9 +196,9 @@ def test_get_transactions_to_customer(client: TestClient) -> None:
     client : TestClient
         FastAPI test client.
     """
-    response = client.get("/api/transactions/to-customer/C1900366749")
+    response = client.get("/api/transactions/to-customer/1557")
     assert response.status_code == 200
     data = response.json()
+    # Returns empty list for Kaggle dataset (no customer-to-customer transfers)
     assert isinstance(data, list)
-    for tx in data:
-        assert tx["nameDest"] == "C1900366749"
+    assert len(data) == 0

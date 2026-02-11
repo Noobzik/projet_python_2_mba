@@ -54,11 +54,11 @@ def test_transactions_service_search(load_sample_data: None) -> None:
         Fixture to ensure data is loaded.
     """
     service = TransactionsService()
-    criteria = TransactionSearch(type="PAYMENT")
+    criteria = TransactionSearch(use_chip="Swipe")
     result = service.search_transactions(criteria, page=1, limit=10)
     assert result.total >= 0
     for tx in result.transactions:
-        assert tx.type == "PAYMENT"
+        assert "Swipe" in tx.use_chip
 
 
 def test_stats_service_overview(load_sample_data: None) -> None:
@@ -116,10 +116,10 @@ def test_fraud_service_predict(load_sample_data: None) -> None:
     """
     service = FraudDetectionService()
     request = FraudPredictionRequest(
-        type="PAYMENT",
         amount=100.0,
-        oldbalanceOrg=1000.0,
-        newbalanceOrig=900.0
+        use_chip="Chip Transaction",
+        merchant_state="ND",
+        mcc=5411
     )
     result = service.predict_fraud(request)
     assert isinstance(result.isFraud, bool)
@@ -149,8 +149,8 @@ def test_customer_service_get_profile(load_sample_data: None) -> None:
         Fixture to ensure data is loaded.
     """
     service = CustomerService()
-    profile = service.get_customer_profile("C1231006815")
-    assert profile.id == "C1231006815"
+    profile = service.get_customer_profile(1556)
+    assert profile.id == 1556
     assert profile.transactions_count > 0
 
 

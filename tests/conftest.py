@@ -17,26 +17,26 @@ def sample_data() -> pd.DataFrame:
     Returns
     -------
     pd.DataFrame
-        Sample transaction data.
+        Sample transaction data matching Kaggle dataset format.
     """
     data = {
-        'step': [1, 1, 2, 2, 3],
-        'type': ['PAYMENT', 'TRANSFER', 'CASH_OUT', 'PAYMENT', 'TRANSFER'],
-        'amount': [9839.64, 181.0, 181.0, 1000.0, 5000.0],
-        'nameOrig': ['C1231006815', 'C1666544295', 'C1305486145',
-                     'C1231006815', 'C1666544295'],
-        'oldbalanceOrg': [170136.0, 181.0, 181.0, 170136.0, 5000.0],
-        'newbalanceOrig': [160296.36, 0.0, 0.0, 169136.0, 0.0],
-        'nameDest': ['M1979787155', 'C1900366749', 'C840083671',
-                     'M1979787155', 'C1900366749'],
-        'oldbalanceDest': [0.0, 0.0, 0.0, 0.0, 0.0],
-        'newbalanceDest': [0.0, 0.0, 0.0, 0.0, 5000.0],
-        'isFraud': [0, 1, 1, 0, 0],
-        'isFlaggedFraud': [0, 0, 0, 0, 0]
+        'id': ['tx_0000000', 'tx_0000001', 'tx_0000002', 'tx_0000003', 'tx_0000004'],
+        'date': ['2010-01-01 00:01:00', '2010-01-01 00:02:00', '2010-01-01 00:03:00',
+                 '2010-01-01 00:04:00', '2010-01-01 00:05:00'],
+        'client_id': [1556, 1557, 1558, 1556, 1557],
+        'card_id': [2972, 2973, 2974, 2972, 2973],
+        'amount': [77.00, 181.0, 181.0, 1000.0, 5000.0],
+        'use_chip': ['Swipe Transaction', 'Chip Transaction', 'Online Transaction',
+                     'Swipe Transaction', 'Chip Transaction'],
+        'merchant_id': [59935, 59936, 59937, 59935, 59936],
+        'merchant_city': ['Beulah', 'Fargo', 'Bismarck', 'Beulah', 'Fargo'],
+        'merchant_state': ['ND', 'ND', 'ND', 'ND', 'ND'],
+        'zip': [58523.0, 58102.0, 58501.0, 58523.0, 58102.0],
+        'mcc': [5499, 5812, 5411, 5499, 5812],
+        'errors': ['', '', '', '', ''],
+        'isFraud': [0, 1, 1, 0, 0]
     }
-    df = pd.DataFrame(data)
-    df['id'] = df.index.map(lambda x: f"tx_{x:07d}")
-    return df
+    return pd.DataFrame(data)
 
 
 @pytest.fixture(scope="session")

@@ -12,7 +12,7 @@ class CustomerProfile(BaseModel):
 
     Parameters
     ----------
-    id : str
+    id : int
         Customer identifier.
     transactions_count : int
         Number of transactions.
@@ -26,7 +26,7 @@ class CustomerProfile(BaseModel):
         Number of fraudulent transactions.
     """
 
-    id: str
+    id: int
     transactions_count: int = Field(..., ge=0)
     avg_amount: float = Field(..., ge=0.0)
     total_amount: float = Field(..., ge=0.0)
@@ -45,14 +45,14 @@ class CustomerList(BaseModel):
         Number of items per page.
     total : int
         Total number of customers.
-    customers : List[str]
+    customers : List[int]
         List of customer IDs.
     """
 
     page: int = Field(..., ge=1)
     limit: int = Field(..., ge=1)
     total: int = Field(..., ge=0)
-    customers: List[str]
+    customers: List[int]
 
 
 class TopCustomer(BaseModel):

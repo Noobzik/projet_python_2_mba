@@ -74,14 +74,14 @@ def get_transactions(
     )
 
 
-@router.get("/methods", response_model=List[str])
-def get_transaction_methods() -> List[str]:
-    """Get list of available transaction methods.
+@router.get("/types", response_model=List[str])
+def get_transaction_types() -> List[str]:
+    """Get list of available transaction types.
 
     Returns
     -------
     List[str]
-        List of unique transaction methods (Swipe, Chip, Online).
+        List of unique transaction types (Swipe, Chip, Online).
     """
     return service.get_transaction_methods()
 
@@ -130,18 +130,18 @@ def search_transactions(
     return service.search_transactions(criteria, page, limit)
 
 
-@router.get("/by-client/{client_id}", response_model=TransactionList)
-def get_transactions_by_client(
-    client_id: int,
+@router.get("/by-customer/{customer_id}", response_model=TransactionList)
+def get_transactions_by_customer(
+    customer_id: int,
     page: int = Query(1, ge=1, description="Page number"),
     limit: int = Query(50, ge=1, le=100, description="Items per page")
 ) -> TransactionList:
-    """Get paginated transactions by a client.
+    """Get paginated transactions by a customer.
 
     Parameters
     ----------
-    client_id : int
-        Client identifier.
+    customer_id : int
+        Customer identifier.
     page : int
         Page number (default: 1).
     limit : int
@@ -150,9 +150,34 @@ def get_transactions_by_client(
     Returns
     -------
     TransactionList
-        Paginated list of transactions from this client.
+        Paginated list of transactions from this customer.
     """
-    return service.get_transactions_by_client(client_id, page, limit)
+    return service.get_transactions_by_client(customer_id, page, limit)
+
+
+@router.get("/to-customer/{customer_id}", response_model=List[Transaction])
+def get_transactions_to_customer(
+    customer_id: int
+) -> List[Transaction]:
+    """Get transactions received by a customer.
+
+    Note: This endpoint is not applicable to the Kaggle credit card
+    fraud dataset, as it only contains customer-to-merchant transactions,
+    not customer-to-customer transfers. Returns empty list.
+
+    Parameters
+    ----------
+    customer_id : int
+        Customer identifier.
+
+    Returns
+    -------
+    List[Transaction]
+        Empty list (not applicable for this dataset).
+    """
+    # The Kaggle dataset doesn't have customer-to-customer transactions
+    # Only customer-to-merchant transactions exist
+    return []
 
 
 @router.get("/{id}", response_model=Transaction)

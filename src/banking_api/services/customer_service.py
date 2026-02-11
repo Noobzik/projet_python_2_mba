@@ -41,7 +41,7 @@ class CustomerService:
         start_idx = (page - 1) * limit
         end_idx = start_idx + limit
 
-        customers = [str(c) for c in unique_customers[start_idx:end_idx]]
+        customers = unique_customers[start_idx:end_idx]
 
         return CustomerList(
             page=page,
@@ -95,7 +95,7 @@ class CustomerService:
             total_amount = 0.0
 
         return CustomerProfile(
-            id=str(customer_id),
+            id=customer_id,
             transactions_count=transactions_count,
             avg_amount=avg_amount,
             total_amount=total_amount,

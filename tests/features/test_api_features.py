@@ -20,22 +20,23 @@ class TestAPIFeatures(unittest.TestCase):
         This method runs once before all tests.
         """
         data = {
-            'step': [1, 1, 2, 2, 3],
-            'type': ['PAYMENT', 'TRANSFER', 'CASH_OUT', 'PAYMENT', 'TRANSFER'],
-            'amount': [9839.64, 181.0, 181.0, 1000.0, 5000.0],
-            'nameOrig': ['C1231006815', 'C1666544295', 'C1305486145',
-                         'C1231006815', 'C1666544295'],
-            'oldbalanceOrg': [170136.0, 181.0, 181.0, 170136.0, 5000.0],
-            'newbalanceOrig': [160296.36, 0.0, 0.0, 169136.0, 0.0],
-            'nameDest': ['M1979787155', 'C1900366749', 'C840083671',
-                         'M1979787155', 'C1900366749'],
-            'oldbalanceDest': [0.0, 0.0, 0.0, 0.0, 0.0],
-            'newbalanceDest': [0.0, 0.0, 0.0, 0.0, 5000.0],
-            'isFraud': [0, 1, 1, 0, 0],
-            'isFlaggedFraud': [0, 0, 0, 0, 0]
+            'id': ['tx_0000000', 'tx_0000001', 'tx_0000002', 'tx_0000003', 'tx_0000004'],
+            'date': ['2010-01-01 00:01:00', '2010-01-01 00:02:00', '2010-01-01 00:03:00',
+                     '2010-01-01 00:04:00', '2010-01-01 00:05:00'],
+            'client_id': [1556, 1557, 1558, 1556, 1557],
+            'card_id': [2972, 2973, 2974, 2972, 2973],
+            'amount': [77.00, 181.0, 181.0, 1000.0, 5000.0],
+            'use_chip': ['Swipe Transaction', 'Chip Transaction', 'Online Transaction',
+                         'Swipe Transaction', 'Chip Transaction'],
+            'merchant_id': [59935, 59936, 59937, 59935, 59936],
+            'merchant_city': ['Beulah', 'Fargo', 'Bismarck', 'Beulah', 'Fargo'],
+            'merchant_state': ['ND', 'ND', 'ND', 'ND', 'ND'],
+            'zip': [58523.0, 58102.0, 58501.0, 58523.0, 58102.0],
+            'mcc': [5499, 5812, 5411, 5499, 5812],
+            'errors': ['', '', '', '', ''],
+            'isFraud': [0, 1, 1, 0, 0]
         }
         df = pd.DataFrame(data)
-        df['id'] = df.index.map(lambda x: f"tx_{x:07d}")
 
         loader = DataLoader()
         loader._data = df
@@ -62,7 +63,7 @@ class TestAPIFeatures(unittest.TestCase):
             response = self.client.get(f"/api/transactions/{tx_id}")
             self.assertEqual(response.status_code, 200)
 
-        search_criteria = {"type": "PAYMENT"}
+        search_criteria = {"use_chip": "Swipe"}
         response = self.client.post("/api/transactions/search", json=search_criteria)
         self.assertEqual(response.status_code, 200)
 
@@ -112,10 +113,10 @@ class TestAPIFeatures(unittest.TestCase):
         self.assertIsInstance(fraud_stats, list)
 
         transaction = {
-            "type": "TRANSFER",
             "amount": 300000.0,
-            "oldbalanceOrg": 400000.0,
-            "newbalanceOrig": 100000.0
+            "use_chip": "Online Transaction",
+            "merchant_state": "CA",
+            "mcc": 5999
         }
         response = self.client.post("/api/fraud/predict", json=transaction)
         self.assertEqual(response.status_code, 200)
@@ -187,11 +188,11 @@ class TestAPIFeatures(unittest.TestCase):
 
         This test verifies filtering works across endpoints.
         """
-        response = self.client.get("/api/transactions?type=PAYMENT&isFraud=0")
+        response = self.client.get("/api/transactions?use_chip=Swipe&isFraud=0")
         self.assertEqual(response.status_code, 200)
         data = response.json()
         for tx in data["transactions"]:
-            self.assertEqual(tx["type"], "PAYMENT")
+            self.assertIn("Swipe", tx["use_chip"])
             self.assertEqual(tx["isFraud"], 0)
 
     def test_error_handling_feature(self) -> None:
@@ -202,7 +203,7 @@ class TestAPIFeatures(unittest.TestCase):
         response = self.client.get("/api/transactions/invalid_id")
         self.assertEqual(response.status_code, 404)
 
-        response = self.client.get("/api/customers/NONEXISTENT")
+        response = self.client.get("/api/customers/99999")
         self.assertEqual(response.status_code, 404)
 
         response = self.client.delete("/api/transactions/invalid_id")
@@ -218,7 +219,7 @@ class TestAPIFeatures(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         overview = response.json()
 
-        response = self.client.get("/api/transactions?limit=100000")
+        response = self.client.get("/api/transactions?limit=100")
         self.assertEqual(response.status_code, 200)
         transactions = response.json()
 
