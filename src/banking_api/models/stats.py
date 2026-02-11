@@ -3,7 +3,7 @@
 This module defines Pydantic models for statistical responses.
 """
 
-from typing import List, Dict
+from typing import List
 from pydantic import BaseModel, Field
 
 

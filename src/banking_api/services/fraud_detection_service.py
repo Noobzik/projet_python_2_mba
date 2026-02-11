@@ -3,7 +3,7 @@
 This module provides business logic for fraud detection and analysis.
 """
 
-from typing import Dict, List
+from typing import List
 import pandas as pd
 from ..models.stats import FraudSummary, FraudByType
 from ..models.transaction import FraudPredictionRequest, FraudPredictionResponse
@@ -32,18 +32,27 @@ class FraudDetectionService:
 
         # Parse amount if needed - use vectorized operations
         if df['amount'].dtype == 'object':
-            amounts = df['amount'].str.replace('$', '').str.replace(',', '').astype(float)
+            amounts = (
+                df['amount']
+                .str.replace('$', '')
+                .str.replace(',', '')
+                .astype(float)
+            )
         else:
             amounts = df['amount']
 
         total_transactions = len(df)
         total_frauds = int(df['isFraud'].sum())
         flagged = total_frauds
-        fraud_rate = total_frauds / total_transactions if total_transactions > 0 else 0.0
+        fraud_rate = (
+            total_frauds / total_transactions if total_transactions > 0 else 0.0
+        )
 
         # Calculate fraud amount using boolean indexing
         fraud_mask = df['isFraud'] == 1
-        total_fraud_amount = float(amounts[fraud_mask].sum()) if fraud_mask.any() else 0.0
+        total_fraud_amount = (
+            float(amounts[fraud_mask].sum()) if fraud_mask.any() else 0.0
+        )
 
         # Handle NaN
         if pd.isna(total_fraud_amount):
@@ -75,7 +84,10 @@ class FraudDetectionService:
 
         fraud_stats = []
         for _, row in grouped.iterrows():
-            fraud_rate = row['fraud_count'] / row['total_count'] if row['total_count'] > 0 else 0.0
+            fraud_rate = (
+                row['fraud_count'] / row['total_count']
+                if row['total_count'] > 0 else 0.0
+            )
 
             fraud_stats.append(FraudByType(
                 type=str(row['type']),
