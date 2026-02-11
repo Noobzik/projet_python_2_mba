@@ -4,6 +4,7 @@ This module defines Pydantic models for transaction data validation
 and serialization.
 """
 
+from datetime import datetime
 from typing import Optional, List, Any
 import pandas as pd
 from pydantic import BaseModel, Field, field_validator
@@ -16,7 +17,7 @@ class Transaction(BaseModel):
     ----------
     id : str
         Unique transaction identifier.
-    date : str
+    date : datetime
         Transaction date and time.
     client_id : int
         Customer ID who made the transaction.
@@ -43,7 +44,7 @@ class Transaction(BaseModel):
     """
 
     id: str
-    date: str
+    date: datetime
     client_id: int
     card_id: int
     amount: float
