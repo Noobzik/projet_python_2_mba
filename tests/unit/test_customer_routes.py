@@ -3,7 +3,6 @@
 This module tests all customer-related API endpoints.
 """
 
-import pytest
 from fastapi.testclient import TestClient
 
 

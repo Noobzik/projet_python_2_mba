@@ -1,4 +1,7 @@
-# Portfolio asset retrieval management.
+# Portfolio asset retrieval management
+
+[![CI/CD Pipeline](https://github.com/lucaslgk/projet_python_2_mba/actions/workflows/ci.yml/badge.svg)](https://github.com/lucaslgk/projet_python_2_mba/actions/workflows/ci.yml)
+
 
 Le but de ce projet est de développer une API permettant d'exposer une API des transactions fictives.
 Les technos à utiliser sont :

@@ -4,7 +4,7 @@ This module defines Pydantic models for transaction data validation
 and serialization.
 """
 
-from typing import Optional, List
+from typing import Optional, List, Any
 import pandas as pd
 from pydantic import BaseModel, Field, field_validator
 
@@ -78,7 +78,7 @@ class Transaction(BaseModel):
 
     @field_validator('errors', 'merchant_city', 'merchant_state', mode='before')
     @classmethod
-    def parse_optional_string_fields(cls, v) -> Optional[str]:
+    def parse_optional_string_fields(cls, v: Any) -> Optional[str]:
         """Parse optional string fields, handling NaN values.
 
         Parameters
@@ -97,7 +97,7 @@ class Transaction(BaseModel):
 
     @field_validator('use_chip', mode='before')
     @classmethod
-    def parse_use_chip(cls, v) -> Optional[str]:
+    def parse_use_chip(cls, v: Any) -> Optional[str]:
         """Parse use_chip field, providing default for NaN.
 
         Parameters

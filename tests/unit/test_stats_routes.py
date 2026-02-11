@@ -3,7 +3,6 @@
 This module tests all statistics-related API endpoints.
 """
 
-import pytest
 from fastapi.testclient import TestClient
 
 
