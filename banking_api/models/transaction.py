@@ -91,7 +91,8 @@ class TransactionSearchRequest(BaseModel):
 
     type: Optional[str] = Field(None, description="Filtre par type de transaction")
     isFraud: Optional[int] = Field(None, ge=0, le=1, description="Filtre fraude")
-    amount_range: Optional[list[float]] = Field(None, description="Intervalle de montant [min, max]")
+    amount_range: Optional[list[float]] = Field(
+        None, description="Intervalle de montant [min, max]")
     customer_id: Optional[str] = Field(None, description="Filtre identifiant client")
 
 
