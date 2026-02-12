@@ -5,7 +5,6 @@ This module provides fraud analysis and simple prediction scoring.
 """
 
 from typing import List, Dict, Any
-from collections import Counter
 from app.utils.loader import load_transactions
 from app.models.schemas import (
     FraudSummary,
@@ -94,18 +93,18 @@ def get_fraud_by_type() -> List[FraudByType]:
         return []
 
     fraud_stats = []
-    
+
     # Group by type
     types = set(t.get("type") for t in data if t.get("type"))
-    
+
     for tx_type in types:
         # All transactions of this type
         type_txs = [t for t in data if t.get("type") == tx_type]
         total_count = len(type_txs)
-        
+
         # Fraudulent transactions of this type
         fraud_count = sum(1 for t in type_txs if int(t.get("isFraud", 0)) == 1)
-        
+
         # Fraud rate
         fraud_rate = (fraud_count / total_count) if total_count > 0 else 0.0
 

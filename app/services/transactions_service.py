@@ -10,7 +10,6 @@ from app.utils.loader import load_transactions
 from app.models.schemas import (
     TransactionResponse,
     PaginatedTransactionsResponse,
-    TransactionSearchRequest,
 )
 
 _TRANSACTIONS: List[Dict[str, Any]] | None = None

@@ -49,7 +49,7 @@ def get_customers(page: int, limit: int) -> PaginatedCustomersResponse:
         Paginated customer list
     """
     data = _get_data()
-    
+
     # Get unique customer IDs from nameOrig
     unique_customers = sorted({t.get("nameOrig") for t in data if t.get("nameOrig")})
     total = len(unique_customers)
@@ -82,7 +82,7 @@ def get_customer_profile(customer_id: str) -> Optional[Customer]:
         Customer profile or None if not found
     """
     data = _get_data()
-    
+
     # Get all transactions for this customer (as origin)
     customer_txs = [t for t in data if t.get("nameOrig") == customer_id]
 
@@ -119,7 +119,7 @@ def get_top_customers(n: int) -> List[TopCustomer]:
         Top customers ranked by total amount
     """
     data = _get_data()
-    
+
     # Aggregate by customer
     customer_stats = defaultdict(lambda: {"total_amount": 0.0, "count": 0})
 

@@ -150,7 +150,7 @@ def read_root() -> str:
         <body>
             <div class="container">
                 <h1>🏦 Banking Transactions API</h1>
-                
+
                 <div class="info">
                     <p><strong>Version:</strong> 1.0.0</p>
                     <p><strong>Description:</strong> API REST pour l'analyse des transactions bancaires</p>

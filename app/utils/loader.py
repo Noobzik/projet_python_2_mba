@@ -34,7 +34,7 @@ def load_transactions() -> List[Dict[str, Any]]:
         If CSV file not found
     """
     global _TRANSACTIONS_CACHE
-    
+
     if _TRANSACTIONS_CACHE is not None:
         return _TRANSACTIONS_CACHE
 
@@ -43,7 +43,7 @@ def load_transactions() -> List[Dict[str, Any]]:
     try:
         with open(DATA_PATH, newline="", encoding="utf-8") as file:
             reader = csv.DictReader(file)
-            
+
             # Charger seulement MAX_TRANSACTIONS lignes pour éviter problèmes mémoire
             transactions = []
             for i, row in enumerate(reader):
@@ -51,7 +51,7 @@ def load_transactions() -> List[Dict[str, Any]]:
                     print(f"⚠️  Limite atteinte: chargement de {MAX_TRANSACTIONS:,} transactions")
                     break
                 transactions.append(row)
-            
+
             print(f"📦 Processing {len(transactions):,} transactions...")
 
             # Convert numeric fields and add ID
@@ -60,33 +60,33 @@ def load_transactions() -> List[Dict[str, Any]]:
                 tx["id"] = f"tx_{i:07d}"
 
                 # CHECK FORMAT: Card transactions vs Banking transactions
-                if "client_id" in tx:  
+                if "client_id" in tx:
                     # ✅ DATASET CARTE BANCAIRE - Utiliser les VRAIES données
                     tx["step"] = i % 100  # Simuler un step (pas dans le dataset carte)
-                    
+
                     # 🎯 TYPE: Tout en PAYMENT (transaction par carte = paiement)
                     tx["type"] = "PAYMENT"
-                    
+
                     # Clean amount (remove $ and convert)
                     amount_str = str(tx.get("amount", "0"))
                     try:
                         tx["amount"] = float(amount_str.replace("$", "").replace(",", ""))
-                    except:
+                    except BaseException:
                         tx["amount"] = 0.0
-                    
+
                     # Create banking fields from card data
                     client_id = str(tx.get('client_id', '0')).strip()
                     merchant_id = str(tx.get('merchant_id', '0')).strip()
-                    
+
                     tx["nameOrig"] = f"C{client_id}"
                     tx["nameDest"] = f"M{merchant_id}"
-                    
+
                     # Soldes: On ne les a pas dans le dataset carte, mettre 0
                     tx["oldbalanceOrg"] = 0.0
                     tx["newbalanceOrig"] = 0.0
                     tx["oldbalanceDest"] = 0.0
                     tx["newbalanceDest"] = 0.0
-                    
+
                     # ✅ FRAUDE: Utiliser la VRAIE colonne "errors"
                     errors_val = str(tx.get("errors", "")).strip()
                     # Si errors est vide ou '0' ou 'No', c'est pas une fraude
@@ -94,10 +94,10 @@ def load_transactions() -> List[Dict[str, Any]]:
                         tx["isFraud"] = 1
                     else:
                         tx["isFraud"] = 0
-                    
+
                     tx["isFlaggedFraud"] = 0
-                    
-                else:  
+
+                else:
                     # Already banking format (Paysim dataset)
                     # Convert numeric fields
                     try:
@@ -126,33 +126,33 @@ def load_transactions() -> List[Dict[str, Any]]:
                 tx.setdefault("nameDest", "")
 
             _TRANSACTIONS_CACHE = transactions
-            
+
         print(f"✅ Loaded {len(_TRANSACTIONS_CACHE):,} transactions successfully")
-        
+
         # Print dataset info
         fraud_count = sum(1 for t in _TRANSACTIONS_CACHE if int(t.get("isFraud", 0)) == 1)
         fraud_rate = (fraud_count / len(_TRANSACTIONS_CACHE) * 100) if _TRANSACTIONS_CACHE else 0
         print(f"📈 Fraud rate: {fraud_rate:.2f}% ({fraud_count:,} fraudulent transactions)")
-        
+
         # Print type distribution
         type_counts = {}
         for t in _TRANSACTIONS_CACHE:
             tx_type = t.get("type", "UNKNOWN")
             type_counts[tx_type] = type_counts.get(tx_type, 0) + 1
-        
-        print(f"📊 Transaction types:")
+
+        print("📊 Transaction types:")
         for tx_type, count in type_counts.items():
             pct = (count / len(_TRANSACTIONS_CACHE) * 100) if _TRANSACTIONS_CACHE else 0
             print(f"   - {tx_type}: {count:,} ({pct:.1f}%)")
-        
+
         return _TRANSACTIONS_CACHE
 
     except FileNotFoundError:
         print(f"❌ ERROR: File not found: {DATA_PATH}")
-        print(f"📁 Please download the dataset from Kaggle:")
-        print(f"   https://www.kaggle.com/datasets/computingvictor/transactions-fraud-datasets/data")
+        print("📁 Please download the dataset from Kaggle:")
+        print("https://www.kaggle.com/datasets/computingvictor/transactions-fraud-datasets/data")
         print(f"   And place 'transactions_data.csv' in: {DATA_PATH.parent}")
-        
+
         # Return empty list to avoid crash
         _TRANSACTIONS_CACHE = []
         return _TRANSACTIONS_CACHE
