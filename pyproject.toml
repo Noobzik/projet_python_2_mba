@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "banking_transactions_api"
+version = "1.0.0"
+description = "API de transactions bancaires pour l'équipe support métier [cite: 9]"
+dependencies = [
+    "fastapi",
+    "uvicorn",
+    "pandas>=2.2.2",
+    "pydantic",
+    "httpx"
+]
+requires-python = ">=3.12"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["app*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+ignore_missing_imports = true
