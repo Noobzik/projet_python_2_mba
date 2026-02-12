@@ -1,0 +1,22 @@
+MANIFEST.in
+include README.md
+include LICENSE
+include requirements.txt
+include pyproject.toml
+include setup.py
+recursive-include banking_api *.py
+recursive-include banking_api py.typed
+exclude tests
+recursive-exclude tests *
+exclude .github
+recursive-exclude .github *
+exclude htmlcov
+recursive-exclude htmlcov *
+exclude .pytest_cache
+recursive-exclude .pytest_cache *
+exclude .mypy_cache
+recursive-exclude .mypy_cache *
+global-exclude __pycache__
+global-exclude *.py[cod]
+global-exclude *$py.class
+global-exclude *.so

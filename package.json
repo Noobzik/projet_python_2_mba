@@ -1,0 +1,28 @@
+{
+  "name": "banking-transactions-api",
+  "version": "1.0.0",
+  "description": "API REST pour l'exposition des données de transactions bancaires",
+  "main": "banking_api/main.py",
+  "scripts": {
+    "start": "uvicorn banking_api.main:app --reload",
+    "test": "pytest --cov=banking_api && python -m unittest discover tests/features",
+    "test:unit": "pytest --cov=banking_api --cov-report=html",
+    "test:features": "python -m unittest discover tests/features",
+    "lint": "flake8 banking_api/ tests/",
+    "format": "black banking_api/ tests/ && isort banking_api/ tests/",
+    "typecheck": "mypy banking_api/",
+    "build": "python -m build",
+    "check": "python check_setup.py"
+  },
+
+  "keywords": [
+    "fastapi",
+    "banking",
+    "transactions",
+    "fraud-detection",
+    "api",
+    "rest"
+  ],
+  "author": "ESG MBA Team",
+  "license": "MIT"
+}
