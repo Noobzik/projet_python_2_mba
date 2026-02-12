@@ -32,7 +32,7 @@ class FraudDetectionService:
         Cette méthode analyse l'ensemble du dataset pour calculer :
         - Le nombre total de fraudes détectées
         - le nombre de fraudes signalées comme frauduleuses
-        - le taux de fraude global
+        - le taux de fraude global (fraudes / transactions totales)
         - le taux de détection des fraudes signalées
         - les métriques de performance du système de détection
 
