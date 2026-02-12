@@ -1,0 +1,98 @@
+name: Banking API CI/CD
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  quality:
+    name: Code Quality
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8 mypy
+        pip install -r requirements.txt
+    
+    - name: Lint with flake8
+      run: |
+        flake8 banking_api/ --count --show-source --statistics
+    
+    - name: Type check with mypy
+      run: |
+        mypy banking_api/
+
+  test:
+    name: Tests
+    runs-on: ubuntu-latest
+    needs: quality
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest pytest-cov pytest-asyncio
+    
+    - name: Create test data directory
+      run: |
+        mkdir -p data
+        # Create minimal test CSV for CI
+        echo "id,date,client_id,card_id,amount,use_chip,merchant_id,merchant_city,merchant_state,zip,mcc,errors" > data/transactions_data.csv
+        echo "1,2023-01-01,1,1,\$100.00,Chip Transaction,1,New York,NY,10001,5411," >> data/transactions_data.csv
+        echo "2,2023-01-02,2,2,\$250.50,Swipe Transaction,2,Los Angeles,CA,90001,5812," >> data/transactions_data.csv
+        echo "3,2023-01-03,1,1,\$75.00,Online Transaction,3,Chicago,IL,60601,5999,Bad PIN" >> data/transactions_data.csv
+    
+    - name: Run pytest with coverage
+      run: |
+        pytest tests/ --cov=banking_api --cov-report=xml --cov-report=term-missing
+    
+    - name: Run unittest
+      run: |
+        python -m unittest discover -s tests -v
+
+  build:
+    name: Build Package
+    runs-on: ubuntu-latest
+    needs: test
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    
+    - name: Install build tools
+      run: |
+        python -m pip install --upgrade pip
+        pip install build wheel setuptools
+    
+    - name: Build package
+      run: |
+        python -m build
+    
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: dist-packages
+        path: dist/
