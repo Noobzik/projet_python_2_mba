@@ -5,7 +5,7 @@ Ce module teste la classe TransactionsService.
 import pytest
 from pathlib import Path
 from banking_api.services.transactions_service import TransactionsService
-from banking_api.models.transaction import TransactionSearchRequest
+from banking_api.models.transaction import TransactionSearchRequest, Transaction
 from banking_api.utils.data_loader import DataLoader
 
 
@@ -57,7 +57,7 @@ class TestTransactionsService:
         assert all(1000.0 <= t.amount <= 50000.0 for t in result.transactions)
     
     def test_get_transaction_by_id_exists(self, service: TransactionsService) -> None:
-        """Tester la récupération d’une transaction existante."""
+        """Tester la récupération d'une transaction existante."""
         transaction = service.get_transaction_by_id('tx_0')
         
         assert transaction is not None
@@ -65,14 +65,20 @@ class TestTransactionsService:
         assert transaction.type == 'PAYMENT'
     
     def test_get_transaction_by_id_not_found(self, service: TransactionsService) -> None:
-        """Tester la récupération d’une transaction inexistante."""
+        """Tester la récupération d'une transaction inexistante."""
         transaction = service.get_transaction_by_id('tx_9999')
         
         assert transaction is None
     
     def test_get_transaction_by_id_invalid_format(self, service: TransactionsService) -> None:
-        """Tester un format d’identifiant de transaction invalide."""
+        """Tester un format d'identifiant de transaction invalide."""
         transaction = service.get_transaction_by_id('invalid_id')
+        
+        assert transaction is None
+    
+    def test_get_transaction_by_id_invalid_letters(self, service: TransactionsService) -> None:
+        """Tester un ID avec lettres après tx_."""
+        transaction = service.get_transaction_by_id('tx_abc')
         
         assert transaction is None
     
@@ -96,6 +102,16 @@ class TestTransactionsService:
         
         assert all(100.0 <= t.amount <= 10000.0 for t in results)
     
+    def test_search_with_empty_amount_range(self, service: TransactionsService) -> None:
+        """Tester la recherche avec amount_range vide."""
+        request = TransactionSearchRequest(
+            type='PAYMENT',
+            amount_range=[100.0]  # Seulement 1 élément
+        )
+        results = service.search_transactions(request)
+        
+        assert isinstance(results, list)
+    
     def test_get_transaction_types(self, service: TransactionsService) -> None:
         """Tester la récupération des types de transactions uniques."""
         types = service.get_transaction_types()
@@ -112,13 +128,13 @@ class TestTransactionsService:
         assert recent[0].step >= recent[-1].step
     
     def test_delete_transaction(self, service: TransactionsService) -> None:
-        """Tester la suppression d’une transaction."""
+        """Tester la suppression d'une transaction."""
         deleted = service.delete_transaction('tx_0')
         
         assert deleted is True
     
     def test_delete_nonexistent_transaction(self, service: TransactionsService) -> None:
-        """Tester la suppression d’une transaction inexistante."""
+        """Tester la suppression d'une transaction inexistante."""
         deleted = service.delete_transaction('tx_9999')
         
         assert deleted is False
@@ -136,3 +152,18 @@ class TestTransactionsService:
         
         assert all(t.nameDest == 'C001' for t in transactions)
         assert len(transactions) == 0
+    
+    def test_transaction_validate_type_invalid(self) -> None:
+        """Tester la validation du type de transaction invalide."""
+        with pytest.raises(ValueError, match="Invalid transaction type"):
+            Transaction(
+                id="tx_999",
+                step=1,
+                type="INVALID_TYPE",
+                amount=100.0,
+                nameOrig="C123",
+                newbalanceOrig=900.0,
+                nameDest="M456",
+                newbalanceDest=100.0,
+                isFraud=0
+            )

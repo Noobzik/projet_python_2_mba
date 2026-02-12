@@ -62,7 +62,7 @@ class TestSystemService:
         assert health.status == 'ok'
     
     def test_get_metadata(self, service: SystemService) -> None:
-        """Tester le point d’accès des métadonnées."""
+        """Tester le point d'accès des métadonnées."""
         metadata = service.get_metadata()
         
         assert metadata.version is not None
@@ -103,3 +103,17 @@ class TestSystemService:
         uptime_str = service._format_uptime(125)
         
         assert 'm' in uptime_str or 'min' in uptime_str.lower()
+    
+    def test_format_uptime_with_days(self, service: SystemService) -> None:
+        """Tester le formatage de l'uptime avec jours."""
+        # Test avec jours, heures, minutes, secondes
+        uptime = service._format_uptime(90061)  # 1d 1h 1m 1s
+        assert "1d" in uptime
+        assert "1h" in uptime
+        assert "1m" in uptime
+        assert "1s" in uptime
+    
+    def test_format_uptime_zero(self, service: SystemService) -> None:
+        """Tester le formatage avec 0 secondes (edge case)."""
+        uptime_zero = service._format_uptime(0)
+        assert uptime_zero == "0s"
