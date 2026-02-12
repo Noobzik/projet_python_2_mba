@@ -1,6 +1,5 @@
-"""Point d’entrée principal de l’application FastAPI.
-
-Ce module initialise l’application FastAPI et enregistre toutes les routes.
+"""Point d'entrée principal de l'application FastAPI.
+Ce module initialise l'application FastAPI et enregistre toutes les routes.
 """
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -19,17 +18,17 @@ from banking_api.config import API_TITLE, API_DESCRIPTION, API_VERSION
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
-    """Gestionnaire de cycle de vie pour les événements de démarrage et d’arrêt.
-
+    """Gestionnaire de cycle de vie pour les événements de démarrage et d'arrêt.
+    
     Parameters
     ----------
     app : FastAPI
-        Instance de l’application FastAPI
-
+        Instance de l'application FastAPI
+        
     Yields
     ------
     None
-        Contrôle du flux pendant la durée de vie de l’application
+        Contrôle du flux pendant la durée de vie de l'application
     """
     data_loader = DataLoader()
     try:
@@ -37,10 +36,10 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         print("Dataset chargé avec succès")
     except Exception as e:
         print(f"Avertissement : impossible de charger le dataset : {e}")
-
+    
     yield
-
-    print("Arrêt de l’application")
+    
+    print("Arrêt de l'application")
 
 
 app = FastAPI(
@@ -69,12 +68,12 @@ app.include_router(system_router)
 
 @app.get("/", tags=["Root"])
 async def root() -> dict[str, str]:
-    """Endpoint racine fournissant les informations de l’API.
-
+    """Endpoint racine fournissant les informations de l'API.
+    
     Returns
     -------
     dict[str, str]
-        Message d’accueil et liens vers la documentation
+        Message d'accueil et liens vers la documentation
     """
     return {
         "message": "Banking Transactions API",
@@ -85,9 +84,13 @@ async def root() -> dict[str, str]:
 
 
 def run() -> None:
-    """Lancer l’application avec uvicorn.
-
-    Cette fonction est utilisée comme point d’entrée de script console.
+    """Lancer l'application avec uvicorn.
+    
+    Cette fonction est utilisée comme point d'entrée de script console.
     """
     import uvicorn
     uvicorn.run("banking_api.main:app", host="0.0.0.0", port=8000, reload=True)
+
+
+if __name__ == "__main__":
+    run()
