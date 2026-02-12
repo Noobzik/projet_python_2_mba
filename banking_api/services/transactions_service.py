@@ -18,10 +18,35 @@ class TransactionsService:
     """Classe de service pour les opérations sur les transactions."""
 
     def __init__(self) -> None:
-        """Initialiser le service des transactions."""
+        """Initialiser le service des transactions.
+
+        Notes
+        -----
+        Instancie le DataLoader pour accéder aux données des transactions.
+        """
         self.data_loader = DataLoader()
 
-    def _df_to_response(self, df: pd.DataFrame) -> list[TransactionResponse]:
+    def _df_to_response(
+        self,
+        df: pd.DataFrame
+    ) -> list[TransactionResponse]:
+        """Convertir un DataFrame en liste de TransactionResponse.
+
+        Parameters
+        ----------
+        df : pd.DataFrame
+            DataFrame contenant les données des transactions
+
+        Returns
+        -------
+        list[TransactionResponse]
+            Liste des transactions converties en objets Pydantic
+
+        Notes
+        -----
+        Méthode interne utilisée pour normaliser les réponses API.
+        Chaque transaction reçoit un identifiant unique préfixé par 'tx_'.
+        """
         transactions = []
         for idx, row in df.iterrows():
             transactions.append(TransactionResponse(
@@ -46,6 +71,39 @@ class TransactionsService:
         min_amount: Optional[float] = None,
         max_amount: Optional[float] = None
     ) -> TransactionListResponse:
+        """Récupérer toutes les transactions avec pagination et filtres.
+
+        Parameters
+        ----------
+        page : int, optional
+            Numéro de la page (default: 1)
+        limit : int, optional
+            Nombre de transactions par page (default: 100)
+        type_filter : str, optional
+            Filtre par type de transaction (PAYMENT, TRANSFER, etc.)
+        is_fraud : int, optional
+            Filtre par statut de fraude (0 ou 1)
+        min_amount : float, optional
+            Montant minimum de la transaction
+        max_amount : float, optional
+            Montant maximum de la transaction
+
+        Returns
+        -------
+        TransactionListResponse
+            Objet contenant la liste paginée des transactions et métadonnées
+
+        Examples
+        --------
+        >>> service = TransactionsService()
+        >>> result = service.get_all_transactions(page=1, limit=10)
+        >>> print(result.total)
+        6362620
+
+        Notes
+        -----
+        Les filtres sont appliqués de manière cumulative.
+        """
         df = self.data_loader.get_data().copy()
 
         if type_filter is not None:
@@ -77,7 +135,30 @@ class TransactionsService:
         self,
         transaction_id: str
     ) -> Optional[TransactionResponse]:
+        """Récupérer une transaction par son identifiant.
 
+        Parameters
+        ----------
+        transaction_id : str
+            Identifiant unique de la transaction (format: 'tx_XXXXX')
+
+        Returns
+        -------
+        TransactionResponse or None
+            La transaction correspondante, ou None si non trouvée
+
+        Examples
+        --------
+        >>> service = TransactionsService()
+        >>> transaction = service.get_transaction_by_id("tx_42")
+        >>> if transaction:
+        ...     print(transaction.amount)
+        181.0
+
+        Notes
+        -----
+        L'identifiant doit commencer par 'tx_' suivi d'un index numérique.
+        """
         if not transaction_id.startswith("tx_"):
             return None
 
@@ -106,13 +187,51 @@ class TransactionsService:
         )
 
     def delete_transaction(self, transaction_id: str) -> bool:
-        # DELETE ne modifie rien, il valide uniquement l’existence
+        """Supprimer une transaction (mode test uniquement).
+
+        Parameters
+        ----------
+        transaction_id : str
+            Identifiant unique de la transaction à supprimer
+
+        Returns
+        -------
+        bool
+            True si la transaction existe, False sinon
+
+        Notes
+        -----
+        Cette méthode valide uniquement l'existence de la transaction.
+        Elle ne modifie pas réellement les données.
+        """
         return self.get_transaction_by_id(transaction_id) is not None
 
     def search_transactions(
         self,
         request: TransactionSearchRequest
     ) -> list[TransactionResponse]:
+        """Rechercher des transactions selon des critères complexes.
+
+        Parameters
+        ----------
+        request : TransactionSearchRequest
+            Objet contenant les critères de recherche
+
+        Returns
+        -------
+        list[TransactionResponse]
+            Liste des transactions correspondant aux critères
+
+        Examples
+        --------
+        >>> service = TransactionsService()
+        >>> request = TransactionSearchRequest(type="PAYMENT", isFraud=1)
+        >>> results = service.search_transactions(request)
+
+        Notes
+        -----
+        Tous les critères sont combinés avec un AND logique.
+        """
         df = self.data_loader.get_data().copy()
 
         if request.type is not None:
@@ -134,6 +253,20 @@ class TransactionsService:
         return self._df_to_response(df)
 
     def get_transaction_types(self) -> list[str]:
+        """Récupérer la liste des types de transactions disponibles.
+
+        Returns
+        -------
+        list[str]
+            Liste triée alphabétiquement des types de transactions
+
+        Examples
+        --------
+        >>> service = TransactionsService()
+        >>> types = service.get_transaction_types()
+        >>> print(types)
+        ['CASH_IN', 'CASH_OUT', 'DEBIT', 'PAYMENT', 'TRANSFER']
+        """
         df = self.data_loader.get_data()
         return sorted(df["type"].unique().tolist())
 
@@ -141,6 +274,25 @@ class TransactionsService:
         self,
         n: int = DEFAULT_RECENT_N
     ) -> list[TransactionResponse]:
+        """Récupérer les N transactions les plus récentes.
+
+        Parameters
+        ----------
+        n : int, optional
+            Nombre de transactions à retourner (default: 10)
+
+        Returns
+        -------
+        list[TransactionResponse]
+            Liste des N transactions les plus récentes
+
+        Examples
+        --------
+        >>> service = TransactionsService()
+        >>> recent = service.get_recent_transactions(n=5)
+        >>> print(len(recent))
+        5
+        """
         df = self.data_loader.get_data()
         df_sorted = df.sort_values("step", ascending=False)
         df_recent = df_sorted.head(n)
@@ -150,6 +302,23 @@ class TransactionsService:
         self,
         customer_id: str
     ) -> list[TransactionResponse]:
+        """Récupérer toutes les transactions émises par un client.
+
+        Parameters
+        ----------
+        customer_id : str
+            Identifiant unique du client émetteur
+
+        Returns
+        -------
+        list[TransactionResponse]
+            Liste des transactions où le client est l'émetteur
+
+        Examples
+        --------
+        >>> service = TransactionsService()
+        >>> transactions = service.get_transactions_by_customer("C1234567890")
+        """
         df = self.data_loader.get_data()
         return self._df_to_response(df[df["nameOrig"] == customer_id])
 
@@ -157,5 +326,23 @@ class TransactionsService:
         self,
         customer_id: str
     ) -> list[TransactionResponse]:
+        """Récupérer toutes les transactions reçues par un client.
+
+        Parameters
+        ----------
+        customer_id : str
+            Identifiant unique du client destinataire
+
+        Returns
+        -------
+        list[TransactionResponse]
+            Liste des transactions où le client est le destinataire
+
+        Examples
+        --------
+        >>> service = TransactionsService()
+        >>> transactions = service.get_transactions_to_customer("M987654321")
+        """
         df = self.data_loader.get_data()
         return self._df_to_response(df[df["nameDest"] == customer_id])
+    
