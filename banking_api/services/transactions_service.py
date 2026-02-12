@@ -345,4 +345,3 @@ class TransactionsService:
         """
         df = self.data_loader.get_data()
         return self._df_to_response(df[df["nameDest"] == customer_id])
-    

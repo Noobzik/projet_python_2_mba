@@ -80,10 +80,10 @@ class FraudDetectionService:
 
         # Calcul du nombre total de transactions frauduleuses détectées
         total_frauds = int(df['isFraud'].sum())
-        
+
         # Calcul du nombre de transactions signalées (flagged)
         flagged = int(df['isFlaggedFraud'].sum())
-        
+
         total_transactions = len(df)
 
         fraud_rate = (
@@ -252,4 +252,3 @@ class FraudDetectionService:
             probability=round(probability, 2),
             risk_level=risk_level
         )
-    

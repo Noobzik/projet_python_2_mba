@@ -117,7 +117,7 @@ class CustomerService:
             - total_amount : Volume total transactionné
             - fraudulent : Implication dans des fraudes
             - fraud_count : Nombre de transactions frauduleuses
-            
+
             Retourne None si le client n'existe pas
 
         Examples
@@ -237,4 +237,3 @@ class CustomerService:
             ))
 
         return top_customers
-    
