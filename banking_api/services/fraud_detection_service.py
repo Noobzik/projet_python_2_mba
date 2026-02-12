@@ -1,7 +1,7 @@
 """Service de détection de fraude pour l’analyse des fraudes.
 
-Ce module gère la détection, l’analyse et la prédiction de fraude
-en utilisant une logique basée sur des règles et des méthodes statistiques.
+Ce service analyse les transactions pour identifier les fraudes potentielles,
+calcule des statistiques de détection et fournit des prédictions.
 """
 from typing import List
 from banking_api.utils.data_loader import DataLoader
@@ -29,6 +29,12 @@ class FraudDetectionService:
 
     def get_fraud_summary(self) -> FraudSummary:
         """Récupérer les statistiques récapitulatives de fraude.
+        Cette méthode analyse l'ensemble du dataset pour calculer :
+        - Le nombre total de fraudes détectées
+        - le nombre de fraudes signalées comme frauduleuses
+        - le taux de fraude global
+        - le taux de détection des fraudes signalées
+        - les métriques de performance du système de détection
 
         Returns
         -------
