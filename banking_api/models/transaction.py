@@ -70,7 +70,7 @@ class Transaction(BaseModel):
         """
         allowed_types = {'PAYMENT', 'TRANSFER', 'CASH_OUT', 'DEBIT', 'CASH_IN'}
         if v not in allowed_types:
-            raise ValueError(f'Type must be one of {allowed_types}')
+            raise ValueError("Invalid transaction type")
         return v
 
 
