@@ -50,7 +50,7 @@ Ce projet consiste à déployer une application complète permettant d'exposer l
 
 ---
 
-##  3. Organisation des Services & Rôles
+##  3. Organisation des Services
 
 Le projet respecte la séparation des responsabilités demandée :
 
