@@ -1,4 +1,3 @@
-
 # Banking Transactions API - Projet Python MBA
 
 API REST complète pour l'exposition et la manipulation des données de transactions bancaires fictives.
@@ -45,7 +44,7 @@ pip install -r requirements-dev.txt
 
 ## Données
 
-**Important** : Le fichier CSV des transactions n'est pas inclus dans ce repository (conformément aux consignes du projet).
+ **Important** : Le fichier CSV des transactions n'est pas inclus dans ce repository (conformément aux consignes du projet).
 
 Pour utiliser l'API, téléchargez le dataset depuis :
 https://www.kaggle.com/datasets/computingvictor/transactions-fraud-datasets/
@@ -153,6 +152,24 @@ docker build -t banking-api .
 docker run -p 8000:8000 banking-api
 ```
 
+## Application Streamlit (Bonus)
+
+Une application de visualisation interactive a été développée pour explorer les données de l'API.
+
+**Repository** : https://github.com/seynabou2/banking_api_streamlit_app
+
+**Fonctionnalités :**
+- Visualisation des transactions en temps réel
+- Graphiques et statistiques interactives
+- Analyse de la détection de fraude
+- Dashboard des clients et métriques
+
+**Pour utiliser l'application Streamlit :**
+1. Cloner le repository séparé
+2. Installer les dépendances
+3. Lancer l'API Banking (ce projet sur le port 8000)
+4. Lancer l'application Streamlit
+
 ## Fonctionnalités bonus
 
 - CI/CD avec GitHub Actions
@@ -160,6 +177,7 @@ docker run -p 8000:8000 banking-api
 - Type checking avec mypy
 - Linting avec flake8
 - Conteneurisation Docker
+- Application Streamlit de visualisation
 
 ## Contributeurs
 
@@ -172,6 +190,7 @@ docker run -p 8000:8000 banking-api
 - [Sujet du projet](projet_python.pdf)
 - [Documentation FastAPI](https://fastapi.tiangolo.com/)
 - [Dataset Kaggle](https://www.kaggle.com/datasets/computingvictor/transactions-fraud-datasets/)
+- [Application Streamlit](https://github.com/seynabou2/banking_api_streamlit_app)
 
 ---
 
