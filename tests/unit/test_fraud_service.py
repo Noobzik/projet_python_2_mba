@@ -3,7 +3,6 @@
 Ce module teste la classe FraudDetectionService.
 """
 
-
 from banking_api.services.fraud_detection_service import FraudDetectionService
 
 

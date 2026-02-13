@@ -179,17 +179,18 @@ class TestDataLoaderCoverage:
     def test_adapt_columns_unknown_use_chip_value(self, tmp_path: Path) -> None:
         """Tester l'adaptation des colonnes avec une valeur use_chip inconnue.
 
-        Couvre la ligne 113 : le branch 'else' dans map_transaction_type.
+        Couvre la ligne 125 : le branch 'else' dans map_transaction_type.
         Cette ligne n'est couverte que si use_chip ne contient ni 'Chip',
         ni 'Swipe', ni 'Online'.
         """
         # Créer un CSV valide avec une valeur use_chip qui ne matche aucune condition
         test_csv = tmp_path / "test_unknown_chip.csv"
-        csv_content = """id,date,client_id,card_id,amount,use_chip,merchant_id,
-        merchant_city,merchant_state,zip,mcc,errors
-1,2023-01-01,123,456,$100.00,Unknown_Method,789,Paris,FR,75001,5411,
-2,2023-01-02,124,457,$200.00,Magnetic_Strip,790,Lyon,FR,69001,5812,
-"""
+        csv_content = (
+            "id,date,client_id,card_id,amount,use_chip,merchant_id,"
+            "merchant_city,merchant_state,zip,mcc,errors\n"
+            "1,2023-01-01,123,456,$100.00,Unknown_Method,789,Paris,FR,75001,5411,\n"
+            "2,2023-01-02,124,457,$200.00,Magnetic_Strip,790,Lyon,FR,69001,5812,\n"
+        )
         test_csv.write_text(csv_content, encoding="utf-8")
 
         loader = DataLoader()

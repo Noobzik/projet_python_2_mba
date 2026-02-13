@@ -1,5 +1,6 @@
 """Configuration setup pour le package banking-transactions-api."""
-from setuptools import setup, find_packages
+
+from setuptools import find_packages, setup
 
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
@@ -32,6 +33,13 @@ setup(
             "flake8>=7.0.0",
             "mypy>=1.8.0",
             "httpx>=0.26.0",
+            "black>=24.0.0",
+            "isort>=5.13.0",
+        ],
+    },
+    entry_points={
+        "console_scripts": [
+            "banking-api=banking_api.main:run",
         ],
     },
 )
