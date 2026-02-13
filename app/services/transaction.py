@@ -1,6 +1,7 @@
 import pandas as pd
 from typing import Optional, Dict, Any, List
 from app.config import connexion_dataset
+import math
 # Chargement du dataset 
 df = connexion_dataset()
 
@@ -77,50 +78,60 @@ def get_transaction_by_id(transaction_id: str) -> Optional[Dict[str, Any]]:
 
 #3 Recherche multicritère (POST avec corps JSON) 
 
+
+
 def search_transactions(payload: Dict[str, Any]) -> Dict[str, Any]:
 
-    page = payload.get("page", 1)
-    limit = payload.get("limit", 10)
+    # Pagination
+    page = int(payload.get("page", 1))
+    limit = int(payload.get("limit", 10))
+
+    if page < 1:
+        page = 1
+    if limit < 1:
+        limit = 10
+
     tx_type = payload.get("type")
     is_fraud = payload.get("isFraud")
-    min_amount = payload.get("min_amount")
-    max_amount = payload.get("max_amount")
+    amount_range = payload.get("amount_range")
 
     filtered_df = df.copy()
 
-    # Filtre type
+    # ✅ Filtre par type
     if tx_type:
         filtered_df = filtered_df[
-            filtered_df["Transaction Type"].str.lower() == tx_type.lower()
+            filtered_df["Transaction Type"].str.upper() == str(tx_type).upper()
         ]
- # Filtre fraude
+
+    # ✅ Filtre fraude (0 ou 1)
     if is_fraud is not None:
         filtered_df = filtered_df[
-            filtered_df["Fraud Flag"] == is_fraud
+            filtered_df["Fraud Flag"] == int(is_fraud)
         ]
 
-    # Filtre montant min
-    if min_amount is not None:
-        filtered_df = filtered_df[
-            filtered_df["Transaction Amount"] >= min_amount
-        ]
+    # ✅ Filtre montant via amount_range [min, max]
+    if amount_range and isinstance(amount_range, list) and len(amount_range) == 2:
+        min_amount, max_amount = amount_range
 
-    # Filtre montant max
-    if max_amount is not None:
         filtered_df = filtered_df[
-            filtered_df["Transaction Amount"] <= max_amount
+            (filtered_df["Transaction Amount"] >= float(min_amount)) &
+            (filtered_df["Transaction Amount"] <= float(max_amount))
         ]
 
     total = len(filtered_df)
-  # Pagination
+
+    # ✅ Pagination
     start = (page - 1) * limit
     end = start + limit
     paginated_df = filtered_df.iloc[start:end]
+
+    total_pages = math.ceil(total / limit) if limit else 1
 
     return {
         "page": page,
         "limit": limit,
         "total": total,
+        "total_pages": total_pages,
         "results": paginated_df.to_dict(orient="records")
     }
 
