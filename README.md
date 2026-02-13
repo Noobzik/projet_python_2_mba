@@ -185,6 +185,50 @@ banking-transactions-api/
 - **Tests**: 60+
 - **Couverture**: ≥80%
 
+
+## 📊 Dashboard Streamlit (Bonus)
+
+Un **Dashboard Streamlit** interactif a été développé pour visualiser et interagir avec l'API de manière intuitive.
+
+### Fonctionnalités du Dashboard
+
+#### Vue d'ensemble
+* Statistiques globales (total transactions, taux de fraude, montant moyen)
+* Graphiques de répartition par type
+* Analyse de la fraude par type
+
+#### Transactions
+* Filtrage par type et statut de fraude
+* Recherche avancée
+* Affichage tabulaire des résultats
+* Statistiques rapides sur les résultats
+
+#### Détection de Fraude
+* Résumé global de la fraude
+* Métriques de performance (précision, rappel)
+* Analyse comparative par type de transaction
+
+#### 👥 Clients
+* Top clients par volume de transactions
+* Graphiques de classement
+* Recherche de profil client individuel
+* Statistiques détaillées par client
+
+#### Prédiction de Fraude
+* Interface de saisie de transaction
+* Prédiction en temps réel
+* Jauge de risque visuelle
+* Recommandations automatiques
+
+### Accès au Dashboard
+
+Le Dashboard Streamlit est disponible dans un repository séparé :
+
+**Repository** : https://github.com/magueyefall1306/Banking-streamlit-api.git
+
+Consultez le README du repository pour les instructions d'installation et de lancement.
+
+
 ## Auteurs
 FALL Magueye
 DRANÉ-COPHY Thandie
