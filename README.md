@@ -92,9 +92,9 @@ La documentation interactive Swagger est disponible sur `http://localhost:8000/d
 
 ## Performance et cache
 
-Le dataset CSV contient un volume important de transactions. Pour optimiser les temps de chargement, l'application met en place un système de cache automatique via pickle.
+**Important :** Le dataset CSV contient un volume important de transactions. Pour optimiser les temps de chargement, l'application met en place un système de cache automatique via pickle.
 
-**Premier lancement** : au démarrage initial, l'API lit le fichier `transactions_data.csv`, effectue le parsing des colonnes (dates, montants, types), fusionne les labels de fraude depuis `train_fraud_labels.json`, optimise les types de données (colonnes catégoriques, tri par date), puis sérialise le DataFrame résultant dans un fichier `transactions_data.pkl` dans le répertoire `data/`. Cette opération peut prendre plusieurs dizaines de secondes selon la taille du dataset et les performances de la machine.
+**Premier lancement** : au démarrage initial, l'API lit le fichier `transactions_data.csv`, effectue le parsing des colonnes (dates, montants, types), fusionne les labels de fraude depuis `train_fraud_labels.json`, optimise les types de données (colonnes catégoriques, tri par date), puis sérialise le DataFrame résultant dans un fichier `transactions_data.pkl` dans le répertoire `data/`. **Cette opération peut prendre plusieurs dizaines de secondes selon la taille du dataset et les performances de la machine.**
 
 **Lancements suivants** : l'application détecte automatiquement la présence du fichier `.pkl` et compare sa date de modification avec celle du CSV source. Si le cache est plus récent que le CSV, le DataFrame est chargé directement depuis le pickle, ce qui réduit le temps de démarrage à quelques secondes.
 
