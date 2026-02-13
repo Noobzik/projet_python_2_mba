@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build-meta"
+
+[project]
+name = "banking_api"
+version = "0.1.0"
+description = "API de gestion de transactions bancaires avec FastAPI"
+authors = [
+    {name = "Matthieu Ayina"}
+]
+dependencies = [
+    "fastapi",
+    "uvicorn",
+    "pandas",
+    "pydantic"
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest",
+    "pytest-cov"
+]
