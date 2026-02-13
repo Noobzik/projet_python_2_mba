@@ -166,7 +166,7 @@ banking-transactions-api/
 └── README.md                 # Ce fichier
 ```
 
-## Technologies Utilisées
+## Technologies utilisées
 
 - **Python**: 3.12+
 - **Framework**: FastAPI 0.109.0
@@ -175,7 +175,7 @@ banking-transactions-api/
 - **Testing**: pytest 7.4.4, unittest
 - **Quality**: flake8, mypy, black
 
-## Statistiques du Projet
+## Statistiques du projet
 
 - **Lignes de code**: 3000+
 - **Fichiers Python**: 30+
@@ -190,7 +190,7 @@ banking-transactions-api/
 
 Un **Dashboard Streamlit** interactif a été développé pour visualiser et interagir avec l'API de manière intuitive.
 
-### Fonctionnalités du Dashboard
+### Fonctionnalités du dashboard
 
 #### Vue d'ensemble
 * Statistiques globales (total transactions, taux de fraude, montant moyen)
@@ -203,24 +203,24 @@ Un **Dashboard Streamlit** interactif a été développé pour visualiser et int
 * Affichage tabulaire des résultats
 * Statistiques rapides sur les résultats
 
-#### Détection de Fraude
+#### Détection de fraude
 * Résumé global de la fraude
 * Métriques de performance (précision, rappel)
 * Analyse comparative par type de transaction
 
-#### 👥 Clients
+#### Clients
 * Top clients par volume de transactions
 * Graphiques de classement
 * Recherche de profil client individuel
 * Statistiques détaillées par client
 
-#### Prédiction de Fraude
+#### Prédiction de fraude
 * Interface de saisie de transaction
 * Prédiction en temps réel
 * Jauge de risque visuelle
 * Recommandations automatiques
 
-### Accès au Dashboard
+### Accès au dashboard
 
 Le Dashboard Streamlit est disponible dans un repository séparé :
 
@@ -230,10 +230,11 @@ Consultez le README du repository pour les instructions d'installation et de lan
 
 
 ## Auteurs
-FALL Magueye
-DRANÉ-COPHY Thandie
-DUFERMEAU Jephté
+FALL Magueye;
+DRANÉ-COPHY Thandie;
+DUFERMEAU Jephté;
 GNANVI Emeric
 
 MBA2 - Python - ESG
+
 Pour lancer l'appliactaion : python -m uvicorn app.main:app --reload
