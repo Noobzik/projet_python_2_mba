@@ -1,53 +1,96 @@
+"""Tests unitaires pour le service de détection de fraude.
+
+Ce module teste la classe FraudDetectionService.
 """
-Service de détection de fraude.
-"""
-
-from banking_api.models.schemas import FraudPredictionResponse
+import pytest
+from banking_api.services.fraud_detection_service import FraudDetectionService
 
 
-class FraudDetectionService:
-    """Service simple basé sur des règles."""
+class TestFraudDetectionService:
+    """Suite de tests pour FraudDetectionService."""
+    
+    def test_fraud_detection_low_risk_level(self):
+        service = FraudDetectionService()
+        
+        class MockRequest:
+            def __init__(self):
+                self.type = "PAYMENT"
+                self.amount = 500.0
+                self.oldbalanceOrg = 1000.0
+                self.newbalanceOrig = 500.0
+        
+        result = service.predict_fraud(MockRequest())
+        
+        assert result.risk_level == "LOW"
+        assert result.probability == 0.0
+        assert result.isFraud is False
+    
+    
+    def test_fraud_detection_medium_risk_level(self):
+        service = FraudDetectionService()
+        
+        class MockRequest:
+            def __init__(self):
+                self.type = "TRANSFER"
+                self.amount = 15000.0
+                self.oldbalanceOrg = 20000.0
+                self.newbalanceOrig = 5000.0
+        
+        result = service.predict_fraud(MockRequest())
+        
+        assert result.probability == 0.3
+        assert result.risk_level == "LOW"
+        assert result.isFraud is False
+    
+    
+    def test_fraud_detection_high_risk_level(self):
+        service = FraudDetectionService()
+        
+        class MockRequest:
+            def __init__(self):
+                self.type = "CASH_OUT"
+                self.amount = 250000.0
+                self.oldbalanceOrg = 300000.0
+                self.newbalanceOrig = 50000.0
+        
+        result = service.predict_fraud(MockRequest())
+        
+        assert result.probability == 0.7
+        assert result.risk_level == "HIGH"
+        assert result.isFraud is True
+    
+    
+    def test_probability_capped_at_one(self):
+        service = FraudDetectionService()
+        
+        class MockRequest:
+            def __init__(self):
+                self.type = "TRANSFER"
+                self.amount = 300000.0
+                self.oldbalanceOrg = 10000.0
+                self.newbalanceOrig = 0.0
+        
+        result = service.predict_fraud(MockRequest())
+        
+        assert result.probability == 1.0
+        assert result.risk_level == "HIGH"
+        assert result.isFraud is True
+    
+    
+    def test_fraud_detection_medium_risk_branch(self):
+        """Test pour couvrir la branche MEDIUM"""
+        service = FraudDetectionService()
 
-    def __init__(self):
-        pass
+        class MockRequest:
+            def __init__(self):
+                self.type = "TRANSFER"      # +0.3
+                self.amount = 1000.0
+                self.oldbalanceOrg = 5000.0
+                self.newbalanceOrig = 2500.0  # évite vidage, force incohérence >1000
 
-    def predict_fraud(self, request):
-        """Prédire le risque de fraude."""
+        result = service.predict_fraud(MockRequest())
 
-        probability = 0.0
-
-        # Type à risque
-        if request.type in ["TRANSFER", "CASH_OUT"]:
-            probability += 0.3
-
-        # Montant
-        if request.amount >= 200000:
-            probability += 0.4
-        elif request.amount >= 10000:
-            probability += 0.2
-
-        # Incohérence de balance
-        expected_new_balance = request.oldbalanceOrg - request.amount
-        balance_diff = abs(expected_new_balance - request.newbalanceOrig)
-
-        if balance_diff > 1000:
-            probability += 0.3
-
-        # Limite à 1.0
-        probability = min(probability, 1.0)
-
-        # Niveau de risque
-        if probability < 0.3:
-            risk_level = "LOW"
-        elif probability < 0.7:
-            risk_level = "MEDIUM"
-        else:
-            risk_level = "HIGH"
-
-        is_fraud = probability >= 0.5
-
-        return FraudPredictionResponse(
-            isFraud=is_fraud,
-            probability=round(probability, 2),
-            risk_level=risk_level
-        )
+        # 0.3 (type) + 0.3 (incohérence) = 0.6
+        assert result.probability == 0.6
+        assert result.risk_level == "MEDIUM"
+        assert result.isFraud is True

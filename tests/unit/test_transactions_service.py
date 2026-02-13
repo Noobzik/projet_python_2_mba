@@ -112,6 +112,29 @@ class TestTransactionsService:
         
         assert isinstance(results, list)
     
+    def test_search_by_customer_id_as_destination(self, service: TransactionsService) -> None:
+        """Tester la recherche par customer_id comme destinataire.
+        
+        Couvre la ligne 248 : | (df["nameDest"] == request.customer_id)
+        """
+        # Recherche par un customer_id qui peut apparaître comme destinataire
+        request = TransactionSearchRequest(
+            customer_id="C001"  # Ce client peut être destinataire dans certaines transactions
+        )
+        
+        # Exécuter la recherche - cela va déclencher le code avec les deux conditions :
+        # (df["nameOrig"] == request.customer_id) OU (df["nameDest"] == request.customer_id)  
+        # La ligne 248 est le | (df["nameDest"] == request.customer_id)
+        results = service.search_transactions(request)
+        
+        # Vérifier que tous les résultats ont C001 soit comme expéditeur soit comme destinataire
+        assert all(
+            t.nameOrig == "C001" or t.nameDest == "C001" 
+            for t in results
+        )
+        
+        # Le test passe si aucune exception n'est levée et la ligne 248 est exécutée
+    
     def test_get_transaction_types(self, service: TransactionsService) -> None:
         """Tester la récupération des types de transactions uniques."""
         types = service.get_transaction_types()
@@ -167,3 +190,4 @@ class TestTransactionsService:
                 newbalanceDest=100.0,
                 isFraud=0
             )
+            

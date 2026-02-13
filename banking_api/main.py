@@ -19,12 +19,12 @@ from banking_api.config import API_TITLE, API_DESCRIPTION, API_VERSION
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     """Gestionnaire de cycle de vie pour les événements de démarrage et d'arrêt.
-    
+
     Parameters
     ----------
     app : FastAPI
         Instance de l'application FastAPI
-        
+
     Yields
     ------
     None
@@ -36,9 +36,9 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         print("Dataset chargé avec succès")
     except Exception as e:
         print(f"Avertissement : impossible de charger le dataset : {e}")
-    
+
     yield
-    
+
     print("Arrêt de l'application")
 
 
@@ -69,7 +69,7 @@ app.include_router(system_router)
 @app.get("/", tags=["Root"])
 async def root() -> dict[str, str]:
     """Endpoint racine fournissant les informations de l'API.
-    
+
     Returns
     -------
     dict[str, str]
@@ -85,7 +85,7 @@ async def root() -> dict[str, str]:
 
 def run() -> None:
     """Lancer l'application avec uvicorn.
-    
+
     Cette fonction est utilisée comme point d'entrée de script console.
     """
     import uvicorn
