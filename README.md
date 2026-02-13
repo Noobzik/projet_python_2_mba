@@ -160,31 +160,7 @@ pip install black isort
 # Vérifier uniquement le module banking_api
 flake8 banking_api
 mypy banking_api
-
-# Vérifier le module tests
-flake8 tests
-mypy tests
 ```
-
-#### Vérifications de formatage PEP8
-```bash
-# Vérifier le formatage avec black (mode check seulement)
-black --check banking_api/
-
-# Vérifier l'ordre des imports
-isort --check-only banking_api/
-
-# Vérifier tout le projet
-black --check .
-isort --check-only .
-```
-
-**Note importante** : 
-- `flake8 banking_api` et `mypy banking_api` vérifient uniquement le code source de l'API
-- `flake8 .` et `mypy .` vérifient **tout** le projet, y compris les tests, setup.py, etc.
-- Il est recommandé d'utiliser les commandes avec `.` pour une vérification complète
-- `black --check` et `isort --check-only` ne modifient pas les fichiers, ils vérifient seulement
-- `black` et `isort` sans `--check` modifient automatiquement les fichiers
 
 ### Couverture des tests
 
