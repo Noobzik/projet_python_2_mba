@@ -15,6 +15,8 @@
 
 API REST pour l'exposition et l'analyse de données de transactions bancaires, développée avec FastAPI dans le cadre du projet ESG MBA Big Data & IA.
 
+**L'interface graphique de cette API a été développée et partagée sur le repo suivant : https://github.com/lucaslgk/banking-app-frontend**
+
 ## Table des matières
 
 - [Présentation](#présentation)
