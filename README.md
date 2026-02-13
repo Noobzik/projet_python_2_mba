@@ -4,7 +4,7 @@
 | **Équipe** | **Banking Transactions API** |
 | :--- | :--- |
 | **Tech Lead** | **Godwin Ayita** |
-| **Membres** | **Lilian NGOUNGOU (Dev A)**, **Clément CORNUAULT (Dev B)**, **Ruth NGO MBEM (Dev C)**, **Johann THEBAULT (Dev D)** |
+| **Membres** | **Lilian NGOUNGOU (Dev A)**, **Ruth NGO MBEM (Dev B)**, **Clément CORNUAULT (Dev C)**, **Johann THEBAULT (Dev D)** |
 | **Promotion** | MBA 2 - Big Data & AI |
 
 
