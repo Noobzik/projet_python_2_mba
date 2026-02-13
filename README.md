@@ -115,7 +115,7 @@ En mémoire, le dataset est maintenu via un singleton (`DataLoader`) qui garanti
 | GET      | `/api/transactions/by-customer/{customer_id}` | Transactions émises par un client            |
 | GET      | `/api/transactions/to-customer/{customer_id}` | Transactions reçues par un client (voir note ci-dessous) |
 
-**Note sur la route `to-customer`** : le dataset Kaggle utilisé dans ce projet (credit card fraud dataset) contient exclusivement des transactions de type client vers marchand. Contrairement au dataset Paysim qui dispose de transferts entre clients (champs `nameOrig` / `nameDest`), notre dataset ne comporte pas de transactions inter-clients. La route `to-customer/{customer_id}` a donc été adaptée : le paramètre `customer_id` est interprété comme un `merchant_id`, et l'endpoint retourne les transactions reçues par ce marchand. Ce choix est documenté dans le code source et permet de conserver la route fonctionnelle malgré la structure du dataset.
+**Note sur la route `to-customer`** : le dataset Kaggle utilisé dans ce projet (credit card fraud dataset) contient exclusivement des transactions de type client vers marchand. Contrairement au dataset annoncé dans le sujet qui semble inclure des transferts entre clients (champs `nameOrig` / `nameDest`), notre dataset ne comporte pas de transactions inter-clients. La route `to-customer/{customer_id}` a donc été adaptée : le paramètre `customer_id` est interprété comme un `merchant_id`, et l'endpoint retourne les transactions reçues par ce marchand. Ce choix est documenté dans le code source et permet de conserver la route fonctionnelle malgré la structure du dataset.
 
 ### Statistiques
 
