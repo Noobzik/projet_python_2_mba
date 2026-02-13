@@ -265,7 +265,7 @@ projet_python_2_mba/
 ## Auteurs
 
 - Lucas Goumard
-- Inès Taibi
+- Ines Taibi
 - Aghilas Aissaoui
 - Myriam Bennani
 
