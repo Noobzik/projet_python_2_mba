@@ -1,33 +1,69 @@
-# Portfolio asset retrieval management.
+# 📘 Banking Transactions API — FastAPI Project
 
-Le but de ce projet est de développer une API permettant d'exposer une API des transactions fictives.
-Les technos à utiliser sont :
-- Python
-- FastAPI
-- Pandas
-- Pytest
-- unittest
+## ESG MBA – Évaluation de fin de cours
 
-  
-## Sujet du projet
-Le sujet du projet est disponible dans le document pdf mis à votre disposition dans ce github, et également celui qui est sous votre espace learn.
-La version à jour se trouvera en priorité dans le github, donc pensez à bien vérifier les changements qui sont parvenus.
+**MBA 2 – Python – Exposition de données sous forme d’API**
 
-## Rendu du projet :
-- Sous la forme de Pull Request
-Pour cela, vous devez merge sur une unique branche et que vous ouvrez ensuite un pull-request, afin que je puisse vous évaluer
-- Une copie du répertoire sur le learn
-C'est nécessaire pour prouver à l'école et à l'administration que vous avez bien rendu un livrable. Cependant, je ne regarderais pas les livrables, je regarderais uniquement les rendu sous forme de pull-request.
+---
 
-Important : Merci de ne pas inclure le fichier csv dans vos github, sous peine de pénalités de points.
+## 📌 Présentation du projet
 
-## Comment prendre le main le github de travail :
-1. Forkez le présent projet.
-2. Invitez l'ensemble des membres du groupe.
-3. Commenencez à travailler en collaboration sous la forme de branches.
+Ce projet consiste à développer une **API REST complète avec FastAPI** pour exposer, filtrer et analyser des données de transactions bancaires fictives.
 
-## Information additionnel
-Si vous pensez ne pas être à jour sur vos connaissances de git, vous pouvez suivre ce tutoriel de prise en main de git : 
-- https://learngitbranching.js.org/
+L’API est conçue pour une application métier de **gestion des portefeuilles clients bancaires** et répond aux exigences académiques en matière de :
 
-Attention : Pas de rendu sous la forme d'un gros commit de rendu
+* Qualité du code
+* Tests unitaires et fonctionnels
+* Typage Python
+* Packaging
+* Industrialisation (Docker & CI/CD GitHub Actions)
+
+---
+
+## 👥 Équipe projet
+
+| Nom                 | Email                                                             |
+| ------------------- | ----------------------------------------------------------------- |
+| **Idriss MBE**      | [i_mbe@stu-mba-esg.com](mailto:i_mbe@stu-mba-esg.com)             |
+| **Nadiath SAKA**    | [n_saka@stu-mba-esg.com](mailto:n_saka@stu-mba-esg.com)           |
+| **Michele FAMENI**  | [m_fameni@stu-mba-esg.com](mailto:m_fameni@stu-mba-esg.com)       |
+| **Raouf OROUGOURA** | [r_orougoura@stu-mba-esg.com](mailto:r_orougoura@stu-mba-esg.com) |
+
+---
+
+## 🧱 Architecture du projet
+
+```text
+FastApi/
+│
+├── .github/
+│   └── workflows/         # CI GitHub Actions
+│
+├── app/                   # Application FastAPI
+│   ├── __init__.py
+│   ├── main.py
+│   ├── router/           # Endpoints API
+│   ├── models/            # Schémas Pydantic
+│   └── data/              # Importation et gestion des datasets
+│       ├── import_data.py
+│       ├── load_data.py
+│       └── datasets/      # Fichiers téléchargés manuellement
+│
+├── test/                  # Tests
+│   ├── unit/              # Tests unitaires
+│   └── feature/           # Tests fonctionnels
+│
+├── Dockerfile
+├── pyproject.toml
+├── requirements.txt
+├── README.md
+└── .gitignore
+```
+
+---
+
+## 📥 Téléchargement manuel du dataset
+
+Les données ne sont pas incluses dans le dépôt GitHub. Vous devez télécharger le dataset depuis Kaggle :
+
+👉 https://www.kaggle.com/datasets/computingvictor/transactions-fraud-datasets/data?select=transactions_data.csv
