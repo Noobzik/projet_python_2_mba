@@ -264,9 +264,9 @@ projet_python_2_mba/
 
 ## Auteurs
 
-- Lucas Goumard
-- Ines Taibi
-- Aghilas Aissaoui
-- Myriam Bennani
+- Lucas GOUMARD
+- Ines TAIBI
+- Aghilas AISSAOUI
+- Myriam BENNANI
 
 Projet réalisé dans le cadre du MBA ESG Big Data & IA — Programmation en Python
