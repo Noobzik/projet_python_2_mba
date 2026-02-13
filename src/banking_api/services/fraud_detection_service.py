@@ -76,7 +76,7 @@ class FraudDetectionService:
         df = self.data_loader.get_data()
 
         # Use vectorized groupby for better performance
-        grouped = df.groupby('use_chip', dropna=True).agg({
+        grouped = df.groupby('use_chip', dropna=True, observed=True).agg({
             'isFraud': ['sum', 'count']
         }).reset_index()
 
