@@ -5,15 +5,13 @@ calcule des statistiques de détection et fournit des prédictions.
 
 Contribution: Mame Diarra NDIAYE
 """
+
 from typing import List
-from banking_api.utils.data_loader import DataLoader
-from banking_api.models.schemas import (
-    FraudSummary,
-    FraudByType,
-    FraudPredictionRequest,
-    FraudPredictionResponse
-)
+
 from banking_api.config import FRAUD_THRESHOLD, HIGH_RISK_AMOUNT
+from banking_api.models.schemas import (FraudByType, FraudPredictionRequest,
+                                        FraudPredictionResponse, FraudSummary)
+from banking_api.utils.data_loader import DataLoader
 
 
 class FraudDetectionService:
@@ -79,29 +77,23 @@ class FraudDetectionService:
         df = self.data_loader.get_data()
 
         # Calcul du nombre total de transactions frauduleuses détectées
-        total_frauds = int(df['isFraud'].sum())
+        total_frauds = int(df["isFraud"].sum())
 
         # Calcul du nombre de transactions signalées (flagged)
-        flagged = int(df['isFlaggedFraud'].sum())
+        flagged = int(df["isFlaggedFraud"].sum())
 
         total_transactions = len(df)
 
         fraud_rate = (
-            float(total_frauds / total_transactions)
-            if total_transactions > 0
-            else 0.0
+            float(total_frauds / total_transactions) if total_transactions > 0 else 0.0
         )
-        detection_rate = (
-            float(flagged / total_frauds)
-            if total_frauds > 0
-            else 0.0
-        )
+        detection_rate = float(flagged / total_frauds) if total_frauds > 0 else 0.0
 
         return FraudSummary(
             total_frauds=total_frauds,
             flagged=flagged,
             fraud_rate=round(fraud_rate, 5),
-            detection_rate=round(detection_rate, 4)
+            detection_rate=round(detection_rate, 4),
         )
 
     def get_fraud_by_type(self) -> List[FraudByType]:
@@ -134,35 +126,28 @@ class FraudDetectionService:
         df = self.data_loader.get_data()
 
         # Grouper par type de transaction et compter les occurrences
-        grouped = df.groupby('type').agg({
-            'isFraud': ['sum', 'count']
-        }).reset_index()
+        grouped = df.groupby("type").agg({"isFraud": ["sum", "count"]}).reset_index()
 
-        grouped.columns = ['type', 'fraud_count', 'total_count']
+        grouped.columns = ["type", "fraud_count", "total_count"]
 
         fraud_by_type = []
         for _, row in grouped.iterrows():
-            fraud_count = int(row['fraud_count'])
-            total_count = int(row['total_count'])
-            fraud_rate = (
-                float(fraud_count / total_count)
-                if total_count > 0
-                else 0.0
-            )
+            fraud_count = int(row["fraud_count"])
+            total_count = int(row["total_count"])
+            fraud_rate = float(fraud_count / total_count) if total_count > 0 else 0.0
 
-            fraud_by_type.append(FraudByType(
-                type=str(row['type']),
-                fraud_count=fraud_count,
-                total_count=total_count,
-                fraud_rate=round(fraud_rate, 5)
-            ))
+            fraud_by_type.append(
+                FraudByType(
+                    type=str(row["type"]),
+                    fraud_count=fraud_count,
+                    total_count=total_count,
+                    fraud_rate=round(fraud_rate, 5),
+                )
+            )
 
         return sorted(fraud_by_type, key=lambda x: x.fraud_rate, reverse=True)
 
-    def predict_fraud(
-        self,
-        request: FraudPredictionRequest
-    ) -> FraudPredictionResponse:
+    def predict_fraud(self, request: FraudPredictionRequest) -> FraudPredictionResponse:
         """Prédire la probabilité de fraude pour une transaction.
 
         Il s'agit d'un système simplifié basé sur des règles,
@@ -217,7 +202,7 @@ class FraudDetectionService:
         risk_score = 0.0
 
         # Règle 1: Types à risque
-        if request.type in ['TRANSFER', 'CASH_OUT']:
+        if request.type in ["TRANSFER", "CASH_OUT"]:
             risk_score += 0.3
 
         # Règle 2: Montants élevés
@@ -248,7 +233,5 @@ class FraudDetectionService:
             risk_level = "LOW"
 
         return FraudPredictionResponse(
-            isFraud=is_fraud,
-            probability=round(probability, 2),
-            risk_level=risk_level
+            isFraud=is_fraud, probability=round(probability, 2), risk_level=risk_level
         )

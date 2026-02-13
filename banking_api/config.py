@@ -3,6 +3,7 @@
 Ce module contient tous les paramètres et réglages
 de configuration de l’application.
 """
+
 from pathlib import Path
 from typing import Final
 
@@ -40,7 +41,7 @@ AMOUNT_BINS: Final[list[str]] = [
     "1000-5000",
     "5000-10000",
     "10000-50000",
-    "50000+"
+    "50000+",
 ]
 
 # Seuils de détection de fraude

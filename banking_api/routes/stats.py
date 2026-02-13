@@ -2,15 +2,14 @@
 
 Ce module définit tous les endpoints liés aux statistiques (Routes 9-12).
 """
+
 from typing import List
+
 from fastapi import APIRouter
+
+from banking_api.models.schemas import (AmountDistribution, DailyStats,
+                                        StatsOverview, TypeStats)
 from banking_api.services.stats_service import StatsService
-from banking_api.models.schemas import (
-    StatsOverview,
-    AmountDistribution,
-    TypeStats,
-    DailyStats
-)
 
 router = APIRouter(prefix="/api/stats", tags=["Statistics"])
 service = StatsService()

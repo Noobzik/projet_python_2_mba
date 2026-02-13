@@ -2,6 +2,7 @@
 
 Ce module définit les modèles Pydantic pour les réponses API.
 """
+
 from pydantic import BaseModel, Field
 
 
@@ -64,8 +65,12 @@ class FraudPredictionRequest(BaseModel):
 
     type: str = Field(..., description="Type de transaction")
     amount: float = Field(..., ge=0, description="Montant de la transaction")
-    oldbalanceOrg: float = Field(..., ge=0, description="Ancien solde du compte émetteur")
-    newbalanceOrig: float = Field(..., ge=0, description="Nouveau solde du compte émetteur")
+    oldbalanceOrg: float = Field(
+        ..., ge=0, description="Ancien solde du compte émetteur"
+    )
+    newbalanceOrig: float = Field(
+        ..., ge=0, description="Nouveau solde du compte émetteur"
+    )
 
 
 class FraudPredictionResponse(BaseModel):

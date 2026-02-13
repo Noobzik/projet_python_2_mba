@@ -2,15 +2,16 @@
 
 Ce module définit tous les endpoints liés aux transactions (Routes 1-8).
 """
-from typing import Optional, List
+
+from typing import List, Optional
+
 from fastapi import APIRouter, HTTPException, Query, status
+
+from banking_api.config import DEFAULT_LIMIT, DEFAULT_PAGE, DEFAULT_RECENT_N
+from banking_api.models.transaction import (TransactionListResponse,
+                                            TransactionResponse,
+                                            TransactionSearchRequest)
 from banking_api.services.transactions_service import TransactionsService
-from banking_api.models.transaction import (
-    TransactionResponse,
-    TransactionListResponse,
-    TransactionSearchRequest
-)
-from banking_api.config import DEFAULT_PAGE, DEFAULT_LIMIT, DEFAULT_RECENT_N
 
 router = APIRouter(prefix="/api/transactions", tags=["Transactions"])
 service = TransactionsService()
@@ -19,11 +20,15 @@ service = TransactionsService()
 @router.get("", response_model=TransactionListResponse)
 async def get_transactions(
     page: int = Query(DEFAULT_PAGE, ge=1, description="Numéro de page"),
-    limit: int = Query(DEFAULT_LIMIT, ge=1, le=1000, description="Nombre d’éléments par page"),
+    limit: int = Query(
+        DEFAULT_LIMIT, ge=1, le=1000, description="Nombre d’éléments par page"
+    ),
     type: Optional[str] = Query(None, description="Filtrer par type de transaction"),
-    isFraud: Optional[int] = Query(None, ge=0, le=1, description="Filtrer par statut de fraude"),
+    isFraud: Optional[int] = Query(
+        None, ge=0, le=1, description="Filtrer par statut de fraude"
+    ),
     min_amount: Optional[float] = Query(None, ge=0, description="Montant minimum"),
-    max_amount: Optional[float] = Query(None, ge=0, description="Montant maximum")
+    max_amount: Optional[float] = Query(None, ge=0, description="Montant maximum"),
 ) -> TransactionListResponse:
     """Récupérer une liste paginée de transactions avec filtres optionnels."""
     return service.get_all_transactions(
@@ -32,13 +37,13 @@ async def get_transactions(
         type_filter=type,
         is_fraud=isFraud,
         min_amount=min_amount,
-        max_amount=max_amount
+        max_amount=max_amount,
     )
 
 
 @router.post("/search", response_model=List[TransactionResponse])
 async def search_transactions(
-    request: TransactionSearchRequest
+    request: TransactionSearchRequest,
 ) -> List[TransactionResponse]:
     """Rechercher des transactions selon plusieurs critères."""
     return service.search_transactions(request)
@@ -52,7 +57,9 @@ async def get_transaction_types() -> List[str]:
 
 @router.get("/recent", response_model=List[TransactionResponse])
 async def get_recent_transactions(
-    n: int = Query(DEFAULT_RECENT_N, ge=1, le=100, description="Nombre de transactions récentes")
+    n: int = Query(
+        DEFAULT_RECENT_N, ge=1, le=100, description="Nombre de transactions récentes"
+    )
 ) -> List[TransactionResponse]:
     """Récupérer les N transactions les plus récentes."""
     return service.get_recent_transactions(n)
@@ -77,7 +84,7 @@ async def get_transaction_by_id(id: str) -> TransactionResponse:
     if transaction is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Transaction {id} introuvable"
+            detail=f"Transaction {id} introuvable",
         )
     return transaction
 
@@ -90,7 +97,7 @@ async def delete_transaction(id: str) -> None:
     if transaction is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Transaction {id} introuvable"
+            detail=f"Transaction {id} introuvable",
         )
 
     service.delete_transaction(id)

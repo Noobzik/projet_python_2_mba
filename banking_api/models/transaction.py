@@ -3,7 +3,9 @@
 Ce module définit tous les modèles de données et schémas de validation
 pour les opérations liées aux transactions.
 """
+
 from typing import Optional
+
 from pydantic import BaseModel, Field, field_validator
 
 
@@ -46,9 +48,11 @@ class Transaction(BaseModel):
     oldbalanceDest: float = Field(..., ge=0, description="Ancien solde destinataire")
     newbalanceDest: float = Field(..., ge=0, description="Nouveau solde destinataire")
     isFraud: int = Field(..., ge=0, le=1, description="Indicateur de fraude")
-    isFlaggedFraud: int = Field(..., ge=0, le=1, description="Indicateur de fraude système")
+    isFlaggedFraud: int = Field(
+        ..., ge=0, le=1, description="Indicateur de fraude système"
+    )
 
-    @field_validator('type')
+    @field_validator("type")
     @classmethod
     def validate_type(cls, v: str) -> str:
         """Valider le type de transaction.
@@ -68,7 +72,7 @@ class Transaction(BaseModel):
         ValueError
             Si le type ne fait pas partie des valeurs autorisées
         """
-        allowed_types = {'PAYMENT', 'TRANSFER', 'CASH_OUT', 'DEBIT', 'CASH_IN'}
+        allowed_types = {"PAYMENT", "TRANSFER", "CASH_OUT", "DEBIT", "CASH_IN"}
         if v not in allowed_types:
             raise ValueError("Invalid transaction type")
         return v
@@ -92,7 +96,8 @@ class TransactionSearchRequest(BaseModel):
     type: Optional[str] = Field(None, description="Filtre par type de transaction")
     isFraud: Optional[int] = Field(None, ge=0, le=1, description="Filtre fraude")
     amount_range: Optional[list[float]] = Field(
-        None, description="Intervalle de montant [min, max]")
+        None, description="Intervalle de montant [min, max]"
+    )
     customer_id: Optional[str] = Field(None, description="Filtre identifiant client")
 
 

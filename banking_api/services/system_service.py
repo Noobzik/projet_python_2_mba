@@ -3,12 +3,14 @@
 Ce module gère les opérations au niveau système incluant :
 contrôle de santé, informations de métadonnées et diagnostics du service.
 """
+
 import time
 from datetime import timedelta
 from typing import Dict, Union
-from banking_api.utils.data_loader import DataLoader
-from banking_api.models.schemas import HealthResponse, MetadataResponse
+
 from banking_api.config import API_VERSION, LAST_UPDATE
+from banking_api.models.schemas import HealthResponse, MetadataResponse
+from banking_api.utils.data_loader import DataLoader
 
 
 class SystemService:
@@ -116,7 +118,7 @@ class SystemService:
             status=status,
             uptime=uptime_str,
             dataset_loaded=dataset_loaded,
-            total_records=total_records
+            total_records=total_records,
         )
 
     def get_metadata(self) -> MetadataResponse:
@@ -152,9 +154,7 @@ class SystemService:
             "name": "transactions_data.csv",
             "records": len(df),
             "columns": len(df.columns),
-            "size_mb": int(
-                round(df.memory_usage(deep=True).sum() / (1024 * 1024))
-            )
+            "size_mb": int(round(df.memory_usage(deep=True).sum() / (1024 * 1024))),
         }
 
         total_endpoints = 20
@@ -163,5 +163,5 @@ class SystemService:
             version=API_VERSION,
             last_update=LAST_UPDATE,
             total_endpoints=total_endpoints,
-            dataset_info=dataset_info
+            dataset_info=dataset_info,
         )

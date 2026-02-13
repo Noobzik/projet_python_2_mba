@@ -3,15 +3,16 @@
 Ce module gère toutes les opérations liées aux transactions,
 y compris la récupération, le filtrage et la recherche.
 """
-import pandas as pd
+
 from typing import Optional
+
+import pandas as pd
+
+from banking_api.config import DEFAULT_LIMIT, DEFAULT_PAGE, DEFAULT_RECENT_N
+from banking_api.models.transaction import (TransactionListResponse,
+                                            TransactionResponse,
+                                            TransactionSearchRequest)
 from banking_api.utils.data_loader import DataLoader
-from banking_api.models.transaction import (
-    TransactionResponse,
-    TransactionListResponse,
-    TransactionSearchRequest
-)
-from banking_api.config import DEFAULT_PAGE, DEFAULT_LIMIT, DEFAULT_RECENT_N
 
 
 class TransactionsService:
@@ -26,10 +27,7 @@ class TransactionsService:
         """
         self.data_loader = DataLoader()
 
-    def _df_to_response(
-        self,
-        df: pd.DataFrame
-    ) -> list[TransactionResponse]:
+    def _df_to_response(self, df: pd.DataFrame) -> list[TransactionResponse]:
         """Convertir un DataFrame en liste de TransactionResponse.
 
         Parameters
@@ -49,17 +47,19 @@ class TransactionsService:
         """
         transactions = []
         for idx, row in df.iterrows():
-            transactions.append(TransactionResponse(
-                id=f"tx_{idx}",
-                step=int(row["step"]),
-                type=str(row["type"]),
-                amount=float(row["amount"]),
-                nameOrig=str(row["nameOrig"]),
-                newbalanceOrig=float(row["newbalanceOrig"]),
-                nameDest=str(row["nameDest"]),
-                newbalanceDest=float(row["newbalanceDest"]),
-                isFraud=int(row["isFraud"])
-            ))
+            transactions.append(
+                TransactionResponse(
+                    id=f"tx_{idx}",
+                    step=int(row["step"]),
+                    type=str(row["type"]),
+                    amount=float(row["amount"]),
+                    nameOrig=str(row["nameOrig"]),
+                    newbalanceOrig=float(row["newbalanceOrig"]),
+                    nameDest=str(row["nameDest"]),
+                    newbalanceDest=float(row["newbalanceDest"]),
+                    isFraud=int(row["isFraud"]),
+                )
+            )
         return transactions
 
     def get_all_transactions(
@@ -69,7 +69,7 @@ class TransactionsService:
         type_filter: Optional[str] = None,
         is_fraud: Optional[int] = None,
         min_amount: Optional[float] = None,
-        max_amount: Optional[float] = None
+        max_amount: Optional[float] = None,
     ) -> TransactionListResponse:
         """Récupérer toutes les transactions avec pagination et filtres.
 
@@ -128,12 +128,11 @@ class TransactionsService:
             page=page,
             limit=limit,
             total=total,
-            transactions=self._df_to_response(df_page)
+            transactions=self._df_to_response(df_page),
         )
 
     def get_transaction_by_id(
-        self,
-        transaction_id: str
+        self, transaction_id: str
     ) -> Optional[TransactionResponse]:
         """Récupérer une transaction par son identifiant.
 
@@ -183,7 +182,7 @@ class TransactionsService:
             newbalanceOrig=float(row["newbalanceOrig"]),
             nameDest=str(row["nameDest"]),
             newbalanceDest=float(row["newbalanceDest"]),
-            isFraud=int(row["isFraud"])
+            isFraud=int(row["isFraud"]),
         )
 
     def delete_transaction(self, transaction_id: str) -> bool:
@@ -207,8 +206,7 @@ class TransactionsService:
         return self.get_transaction_by_id(transaction_id) is not None
 
     def search_transactions(
-        self,
-        request: TransactionSearchRequest
+        self, request: TransactionSearchRequest
     ) -> list[TransactionResponse]:
         """Rechercher des transactions selon des critères complexes.
 
@@ -271,8 +269,7 @@ class TransactionsService:
         return sorted(df["type"].unique().tolist())
 
     def get_recent_transactions(
-        self,
-        n: int = DEFAULT_RECENT_N
+        self, n: int = DEFAULT_RECENT_N
     ) -> list[TransactionResponse]:
         """Récupérer les N transactions les plus récentes.
 
@@ -299,8 +296,7 @@ class TransactionsService:
         return self._df_to_response(df_recent)
 
     def get_transactions_by_customer(
-        self,
-        customer_id: str
+        self, customer_id: str
     ) -> list[TransactionResponse]:
         """Récupérer toutes les transactions émises par un client.
 
@@ -323,8 +319,7 @@ class TransactionsService:
         return self._df_to_response(df[df["nameOrig"] == customer_id])
 
     def get_transactions_to_customer(
-        self,
-        customer_id: str
+        self, customer_id: str
     ) -> list[TransactionResponse]:
         """Récupérer toutes les transactions reçues par un client.
 

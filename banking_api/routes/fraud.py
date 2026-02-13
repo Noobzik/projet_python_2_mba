@@ -2,15 +2,14 @@
 
 Ce module définit tous les endpoints liés à la fraude (Routes 13-15).
 """
+
 from typing import List
+
 from fastapi import APIRouter
+
+from banking_api.models.schemas import (FraudByType, FraudPredictionRequest,
+                                        FraudPredictionResponse, FraudSummary)
 from banking_api.services.fraud_detection_service import FraudDetectionService
-from banking_api.models.schemas import (
-    FraudSummary,
-    FraudByType,
-    FraudPredictionRequest,
-    FraudPredictionResponse
-)
 
 router = APIRouter(prefix="/api/fraud", tags=["Fraud Detection"])
 service = FraudDetectionService()
@@ -48,9 +47,7 @@ async def get_fraud_by_type() -> List[FraudByType]:
 
 
 @router.post("/predict", response_model=FraudPredictionResponse)
-async def predict_fraud(
-    request: FraudPredictionRequest
-) -> FraudPredictionResponse:
+async def predict_fraud(request: FraudPredictionRequest) -> FraudPredictionResponse:
     """Prédire la probabilité de fraude pour une transaction donnée.
 
     Utilise une logique basée sur des règles pour évaluer le risque de fraude selon :

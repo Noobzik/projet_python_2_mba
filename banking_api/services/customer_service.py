@@ -3,15 +3,15 @@
 Ce module gère l'agrégation et l'analyse des profils clients
 à partir de l'historique des transactions.
 """
-import pandas as pd
+
 from typing import List, Optional
+
+import pandas as pd
+
+from banking_api.config import DEFAULT_LIMIT, DEFAULT_PAGE, DEFAULT_TOP_N
+from banking_api.models.schemas import (CustomerListResponse, CustomerProfile,
+                                        TopCustomer)
 from banking_api.utils.data_loader import DataLoader
-from banking_api.models.schemas import (
-    CustomerProfile,
-    CustomerListResponse,
-    TopCustomer
-)
-from banking_api.config import DEFAULT_PAGE, DEFAULT_LIMIT, DEFAULT_TOP_N
 
 
 class CustomerService:
@@ -38,9 +38,7 @@ class CustomerService:
         self.data_loader = DataLoader()
 
     def get_all_customers(
-        self,
-        page: int = DEFAULT_PAGE,
-        limit: int = DEFAULT_LIMIT
+        self, page: int = DEFAULT_PAGE, limit: int = DEFAULT_LIMIT
     ) -> CustomerListResponse:
         """Récupérer une liste paginée des clients uniques.
 
@@ -77,10 +75,7 @@ class CustomerService:
         df = self.data_loader.get_data()
 
         # Combiner les clients émetteurs et destinataires
-        unique_customers = pd.concat([
-            df['nameOrig'],
-            df['nameDest']
-        ]).unique().tolist()
+        unique_customers = pd.concat([df["nameOrig"], df["nameDest"]]).unique().tolist()
 
         unique_customers = sorted(unique_customers)
         total = len(unique_customers)
@@ -90,16 +85,10 @@ class CustomerService:
         customers_page = unique_customers[start_idx:end_idx]
 
         return CustomerListResponse(
-            page=page,
-            limit=limit,
-            total=total,
-            customers=customers_page
+            page=page, limit=limit, total=total, customers=customers_page
         )
 
-    def get_customer_profile(
-        self,
-        customer_id: str
-    ) -> Optional[CustomerProfile]:
+    def get_customer_profile(self, customer_id: str) -> Optional[CustomerProfile]:
         """Récupérer le profil client avec résumé des transactions.
 
         Parameters
@@ -139,19 +128,18 @@ class CustomerService:
 
         # Filtrer toutes les transactions impliquant ce client
         customer_txns = df[
-            (df['nameOrig'] == customer_id)
-            | (df['nameDest'] == customer_id)
+            (df["nameOrig"] == customer_id) | (df["nameDest"] == customer_id)
         ]
 
         if len(customer_txns) == 0:
             return None
 
         transactions_count = len(customer_txns)
-        avg_amount = float(customer_txns['amount'].mean())
-        total_amount = float(customer_txns['amount'].sum())
+        avg_amount = float(customer_txns["amount"].mean())
+        total_amount = float(customer_txns["amount"].sum())
 
-        fraud_involved = customer_txns['isFraud'].sum() > 0
-        fraud_count = int(customer_txns['isFraud'].sum())
+        fraud_involved = customer_txns["isFraud"].sum() > 0
+        fraud_count = int(customer_txns["isFraud"].sum())
 
         return CustomerProfile(
             id=customer_id,
@@ -159,7 +147,7 @@ class CustomerService:
             avg_amount=round(avg_amount, 2),
             total_amount=round(total_amount, 2),
             fraudulent=bool(fraud_involved),
-            fraud_count=fraud_count
+            fraud_count=fraud_count,
         )
 
     def get_top_customers(self, n: int = DEFAULT_TOP_N) -> List[TopCustomer]:
@@ -198,42 +186,37 @@ class CustomerService:
         df = self.data_loader.get_data()
 
         # Agréger les volumes en tant qu'émetteur
-        orig_volume = df.groupby('nameOrig').agg({
-            'amount': ['sum', 'count']
-        }).reset_index()
-        orig_volume.columns = [
-            'customer_id',
-            'total_volume',
-            'transaction_count'
-        ]
+        orig_volume = (
+            df.groupby("nameOrig").agg({"amount": ["sum", "count"]}).reset_index()
+        )
+        orig_volume.columns = ["customer_id", "total_volume", "transaction_count"]
 
         # Agréger les volumes en tant que destinataire
-        dest_volume = df.groupby('nameDest').agg({
-            'amount': ['sum', 'count']
-        }).reset_index()
-        dest_volume.columns = [
-            'customer_id',
-            'total_volume',
-            'transaction_count'
-        ]
+        dest_volume = (
+            df.groupby("nameDest").agg({"amount": ["sum", "count"]}).reset_index()
+        )
+        dest_volume.columns = ["customer_id", "total_volume", "transaction_count"]
 
         # Combiner et agréger les deux rôles
         combined = pd.concat([orig_volume, dest_volume])
 
-        aggregated = combined.groupby('customer_id').agg({
-            'total_volume': 'sum',
-            'transaction_count': 'sum'
-        }).reset_index()
+        aggregated = (
+            combined.groupby("customer_id")
+            .agg({"total_volume": "sum", "transaction_count": "sum"})
+            .reset_index()
+        )
 
         # Sélectionner les N meilleurs par volume
-        top_customers_df = aggregated.nlargest(n, 'total_volume')
+        top_customers_df = aggregated.nlargest(n, "total_volume")
 
         top_customers = []
         for _, row in top_customers_df.iterrows():
-            top_customers.append(TopCustomer(
-                customer_id=str(row['customer_id']),
-                total_volume=round(float(row['total_volume']), 2),
-                transaction_count=int(row['transaction_count'])
-            ))
+            top_customers.append(
+                TopCustomer(
+                    customer_id=str(row["customer_id"]),
+                    total_volume=round(float(row["total_volume"]), 2),
+                    transaction_count=int(row["transaction_count"]),
+                )
+            )
 
         return top_customers

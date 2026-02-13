@@ -3,9 +3,12 @@
 Ce module gère le chargement et le prétraitement du fichier CSV des transactions.
 ADAPTÉ pour le dataset des transactions par carte.
 """
-import pandas as pd
+
 from pathlib import Path
 from typing import Optional
+
+import pandas as pd
+
 from banking_api.config import DATA_FILE
 
 
@@ -23,10 +26,10 @@ class DataLoader:
         Données de transactions mises en cache
     """
 
-    _instance: Optional['DataLoader'] = None
+    _instance: Optional["DataLoader"] = None
     _data: Optional[pd.DataFrame] = None
 
-    def __new__(cls) -> 'DataLoader':
+    def __new__(cls) -> "DataLoader":
         """Créer l’instance singleton.
 
         Returns
@@ -78,9 +81,18 @@ class DataLoader:
             raise ValueError("Les données chargées sont vides")
 
         required_columns = [
-            'id', 'date', 'client_id', 'card_id', 'amount',
-            'use_chip', 'merchant_id', 'merchant_city',
-            'merchant_state', 'zip', 'mcc', 'errors'
+            "id",
+            "date",
+            "client_id",
+            "card_id",
+            "amount",
+            "use_chip",
+            "merchant_id",
+            "merchant_city",
+            "merchant_state",
+            "zip",
+            "mcc",
+            "errors",
         ]
 
         missing_cols = set(required_columns) - set(self._data.columns)
@@ -99,38 +111,40 @@ class DataLoader:
         df : pd.DataFrame
             DataFrame à adapter
         """
-        df['step'] = df['id']
+        df["step"] = df["id"]
 
         def map_transaction_type(use_chip: str) -> str:
             use_chip_str = str(use_chip)
-            if 'Chip' in use_chip_str:
-                return 'PAYMENT'
-            elif 'Swipe' in use_chip_str:
-                return 'CASH_OUT'
-            elif 'Online' in use_chip_str:
-                return 'TRANSFER'
+            if "Chip" in use_chip_str:
+                return "PAYMENT"
+            elif "Swipe" in use_chip_str:
+                return "CASH_OUT"
+            elif "Online" in use_chip_str:
+                return "TRANSFER"
             else:
-                return 'DEBIT'
+                return "DEBIT"
 
-        df['type'] = df['use_chip'].apply(map_transaction_type)
+        df["type"] = df["use_chip"].apply(map_transaction_type)
 
-        df['nameOrig'] = 'C' + df['client_id'].astype(str).str.zfill(3)
+        df["nameOrig"] = "C" + df["client_id"].astype(str).str.zfill(3)
 
-        df['nameDest'] = 'M' + df['merchant_id'].astype(str).str.zfill(3)
+        df["nameDest"] = "M" + df["merchant_id"].astype(str).str.zfill(3)
 
-        amount_clean = df['amount'].str.replace(
-            '$', '', regex=False
-        ).str.replace(',', '', regex=False)
-        df['amount'] = amount_clean.astype(float).abs()
+        amount_clean = (
+            df["amount"]
+            .str.replace("$", "", regex=False)
+            .str.replace(",", "", regex=False)
+        )
+        df["amount"] = amount_clean.astype(float).abs()
 
-        df['isFraud'] = df['errors'].notna().astype(int)
+        df["isFraud"] = df["errors"].notna().astype(int)
 
-        df['isFlaggedFraud'] = 0
+        df["isFlaggedFraud"] = 0
 
-        df['oldbalanceOrg'] = df['amount'] * 10
-        df['newbalanceOrig'] = df['oldbalanceOrg'] - df['amount']
-        df['oldbalanceDest'] = df['amount'] * 5
-        df['newbalanceDest'] = df['oldbalanceDest'] + df['amount']
+        df["oldbalanceOrg"] = df["amount"] * 10
+        df["newbalanceOrig"] = df["oldbalanceOrg"] - df["amount"]
+        df["oldbalanceDest"] = df["amount"] * 5
+        df["newbalanceDest"] = df["oldbalanceDest"] + df["amount"]
 
     def get_data(self) -> pd.DataFrame:
         """Récupérer les données de transactions mises en cache.

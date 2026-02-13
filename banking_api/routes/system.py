@@ -2,9 +2,11 @@
 
 Ce module définit tous les endpoints liés au système (Routes 19-20).
 """
+
 from fastapi import APIRouter
-from banking_api.services.system_service import SystemService
+
 from banking_api.models.schemas import HealthResponse, MetadataResponse
+from banking_api.services.system_service import SystemService
 
 router = APIRouter(prefix="/api/system", tags=["System"])
 service = SystemService()

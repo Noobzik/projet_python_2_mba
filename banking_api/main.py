@@ -1,19 +1,17 @@
 """Point d'entrée principal de l'application FastAPI.
 Ce module initialise l'application FastAPI et enregistre toutes les routes.
 """
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
+
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
-from banking_api.routes import (
-    transactions_router,
-    stats_router,
-    fraud_router,
-    customers_router,
-    system_router
-)
+
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
+from banking_api.config import API_DESCRIPTION, API_TITLE, API_VERSION
+from banking_api.routes import (customers_router, fraud_router, stats_router,
+                                system_router, transactions_router)
 from banking_api.utils.data_loader import DataLoader
-from banking_api.config import API_TITLE, API_DESCRIPTION, API_VERSION
 
 
 @asynccontextmanager
@@ -48,7 +46,7 @@ app = FastAPI(
     version=API_VERSION,
     lifespan=lifespan,
     docs_url="/docs",
-    redoc_url="/redoc"
+    redoc_url="/redoc",
 )
 
 app.add_middleware(
@@ -79,7 +77,7 @@ async def root() -> dict[str, str]:
         "message": "Banking Transactions API",
         "version": API_VERSION,
         "docs": "/docs",
-        "redoc": "/redoc"
+        "redoc": "/redoc",
     }
 
 
@@ -89,6 +87,7 @@ def run() -> None:
     Cette fonction est utilisée comme point d'entrée de script console.
     """
     import uvicorn
+
     uvicorn.run("banking_api.main:app", host="0.0.0.0", port=8000, reload=True)
 
 
