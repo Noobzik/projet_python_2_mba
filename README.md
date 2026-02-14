@@ -45,18 +45,7 @@ venv\Scripts\activate.bat
 # Linux/Mac :
 source venv/bin/activate
 
-# Installer le package en mode développement avec les dépendances de dev
-pip install -e ".[dev]"
-```
-
-**Avantages de `pip install -e .` :**
--  Installation en mode éditable (les modifications de code sont immédiatement prises en compte)
-- Commande `banking-api` disponible pour lancer l'API facilement
-- Le package est accessible depuis n'importe où dans l'environnement virtuel
-
-### Installation alternative (dépendances uniquement)
-
-Si vous préférez ne pas installer le package :
+### Installations
 
 ```bash
 # Installer les dépendances de production
@@ -79,19 +68,12 @@ Placez le fichier dans un dossier `data/` à la racine du projet.
 
 ### Lancer l'API
 
-Après installation avec `pip install -e .`, vous pouvez lancer l'API de trois façons :
-
-#### Méthode 1 : Commande directe (Recommandé)
-```bash
-banking-api
-```
-
-#### Méthode 2 : Module Python
+#### Méthode 1 : Module Python
 ```bash
 python -m banking_api.main
 ```
 
-#### Méthode 3 : Uvicorn direct
+#### Méthode 2 : Uvicorn direct
 ```bash
 uvicorn banking_api.main:app --reload --host 0.0.0.0 --port 8000
 ```
@@ -161,6 +143,24 @@ pip install black isort
 flake8 banking_api
 mypy banking_api
 ```
+#### Vérifications de formatage PEP8
+```bash
+# Vérifier le formatage avec black (mode check seulement)
+black --check banking_api/
+
+# Vérifier l'ordre des imports
+isort --check-only banking_api/
+
+# Vérifier tout le projet
+black --check .
+isort --check-only .
+```
+**Note importante** : 
+- `flake8 banking_api` et `mypy banking_api` vérifient uniquement le code source de l'API
+- `flake8 .` et `mypy .` vérifient **tout** le projet, y compris les tests, setup.py, etc.
+- Il est recommandé d'utiliser les commandes avec `.` pour une vérification complète
+- `black --check` et `isort --check-only` ne modifient pas les fichiers, ils vérifient seulement
+- `black` et `isort` sans `--check` modifient automatiquement les fichiers
 
 ### Couverture des tests
 

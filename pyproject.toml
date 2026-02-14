@@ -5,10 +5,6 @@ description = "API REST pour l'exposition des données de transactions bancaires
 authors = ["Seynabou, Mame Diarra, Mathis"]
 readme = "README.md"
 
-packages = [
-    { include = "banking_api" }
-]
-
 [tool.poetry.dependencies]
 python = "^3.12"
 fastapi = "^0.109.0"
