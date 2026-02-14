@@ -4,48 +4,6 @@ Ce projet consiste en une API REST complète développée avec FastAPI, conçue 
 Les données ont été prises sur le site kaggle via le lien suivant: https://www.kaggle.com/datasets/ziya07/transaction-data-for-banking-operations
 L'API est organisée en 5 catégories principales ayant chacune un rôle. (cf. tableau ci-dessous)
 
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>Fonctionnalités du système</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 40px;
-            background-color: #f7f9fc;
-        }
-        h2 {
-            text-align: center;
-        }
-        table {
-            border-collapse: collapse;
-            width: 70%;
-            margin: auto;
-            background: white;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 12px 16px;
-            text-align: left;
-        }
-        th {
-            background-color: white;
-            color: white;
-        }
-        tr:nth-child(even) {
-            background-color: #f2f2f2;
-        }
-        tr:hover {
-            background-color: #e6f2ff;
-        }
-    </style>
-</head>
-<body>
-
-<h2>Tableau des fonctionnalités</h2>
-
 <table>
     <thead>
         <tr>
@@ -76,9 +34,6 @@ L'API est organisée en 5 catégories principales ayant chacune un rôle. (cf. t
         </tr>
     </tbody>
 </table>
-
-</body>
-</html>
 
 
 Le projet est structuré comme un paquet Python installable, incluant une suite de tests unitaires et une intégration CI/CD.
