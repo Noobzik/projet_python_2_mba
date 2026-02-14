@@ -86,9 +86,7 @@ def calculer_taux_fraude_par_type(df):
     return stats.to_dict(orient="records")
 
 def calculer_resume_fraude(df):
-    """
-    Calcule les indicateurs de fraude réels à partir du DataFrame.
-    """
+    # Calcule les indicateurs de fraude réels à partir du DataFrame.
     col_fraud = 'Fraud Flag'
     col_status = 'Transaction Status'
     

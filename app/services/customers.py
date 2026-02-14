@@ -5,19 +5,15 @@ from app.config import connexion_dataset
 # Chargement initial
 df_global = connexion_dataset()
 
+
 def list_customers(df: pd.DataFrame) -> List[str]:
-    """
-    Retourne la liste unique de tous les IDs clients (expéditeurs et destinataires).
-    """
-    # Utilisation de .unique() sur la concaténation des valeurs pour plus de rapidité
+    # Retourne la liste unique de tous les IDs clients (expéditeurs et destinataires).
     combined = pd.concat([df["Sender Account ID"], df["Receiver Account ID"]])
     return combined.dropna().astype(str).unique().tolist()
 
 
 def top_customers(df: pd.DataFrame, n: int = 10) -> List[Dict[str, float]]:
-    """
-    Top N clients par montant total envoyé.
-    """
+    # Top N clients par montant total envoyé.
     top = (
         df.groupby("Sender Account ID", as_index=False)["Transaction Amount"]
         .sum()
@@ -34,9 +30,7 @@ def top_customers(df: pd.DataFrame, n: int = 10) -> List[Dict[str, float]]:
 
 
 def stats_by_type(df: pd.DataFrame) -> List[Dict[str, Union[str, float]]]:
-    """
-    Statistiques par type de transaction.
-    """
+    # Statistiques par type de transaction.
     grouped = (
         df.groupby("Transaction Type")["Transaction Amount"]
         .agg(
@@ -54,9 +48,7 @@ def amount_distribution(
     df: pd.DataFrame, 
     bins: Optional[List[float]] = None
 ) -> Dict[str, List]:
-    """
-    Distribution des montants par tranches.
-    """
+    # Distribution des montants par tranches.
     if bins is None:
         bins = [0, 100, 500, 1000, 5000, float("inf")]
 
@@ -80,3 +72,6 @@ def amount_distribution(
         "labels": labels, # Changé 'bins' en 'labels' pour être plus explicite
         "counts": counts.tolist()
     }
+
+
+

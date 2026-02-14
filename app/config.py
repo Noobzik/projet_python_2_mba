@@ -9,9 +9,8 @@ DATASET_PATH = BASE_DIR / "data" / "transaction_data.csv"
 
 
 def connexion_dataset():
-    """
-    Charge le dataset CSV et retourne un DataFrame pandas.
-    """
+
+    # Charge le dataset CSV et retourne un DataFrame pandas.
     if not DATASET_PATH.exists():
         raise FileNotFoundError(
             f"Le fichier {DATASET_PATH} est introuvable. "

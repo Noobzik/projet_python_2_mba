@@ -3,7 +3,7 @@ from typing import Dict, Any
 import time
 
 # --- Importation du dataset si nécessaire ---
-# df = connexion_dataset()  # Si tu veux vérifier dataset_ready
+# df = connexion_dataset()  # pour vérifier dataset_ready
 
 # Router système
 router_system = APIRouter(

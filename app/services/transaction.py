@@ -78,8 +78,6 @@ def get_transaction_by_id(transaction_id: str) -> Optional[Dict[str, Any]]:
 
 #3 Recherche multicritère (POST avec corps JSON) 
 
-
-
 def search_transactions(payload: Dict[str, Any]) -> Dict[str, Any]:
 
     # Pagination
