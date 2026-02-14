@@ -1,0 +1,20 @@
+Metadata-Version: 2.4
+Name: banking-transactions-api
+Version: 1.0.0
+Summary: FastAPI project exposing banking transactions dataset through a REST API.
+Author: Your Team
+Requires-Python: >=3.12
+Description-Content-Type: text/markdown
+Requires-Dist: fastapi>=0.110
+Requires-Dist: uvicorn>=0.27
+Requires-Dist: pydantic>=2.5
+Requires-Dist: pandas>=2.2
+Requires-Dist: numpy>=1.26
+Requires-Dist: python-dotenv>=1.0
+Provides-Extra: dev
+Requires-Dist: pytest>=8.0; extra == "dev"
+Requires-Dist: pytest-cov>=5.0; extra == "dev"
+Requires-Dist: flake8>=7.0; extra == "dev"
+Requires-Dist: mypy>=1.8; extra == "dev"
+Requires-Dist: httpx>=0.26; extra == "dev"
+Requires-Dist: types-python-dateutil; extra == "dev"
