@@ -56,10 +56,8 @@ FastApi/
 ├── app/                   # Application FastAPI
 │   ├── __init__.py
 │   ├── main.py
-│   ├── routers/           # Endpoints API
-│   ├── services/          # Logique métier
+│   ├── router/           # Endpoints API
 │   ├── models/            # Schémas Pydantic
-│   ├── utils/             # Fonctions utilitaires
 │   └── data/              # Importation et gestion des datasets
 │       ├── import_data.py
 │       ├── load_data.py
