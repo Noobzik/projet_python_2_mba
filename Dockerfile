@@ -12,7 +12,7 @@ COPY pyproject.toml README.md ./
 
 # 5. Installation des dépendances de production ET de dev (pour pouvoir tester)
 # On utilise [dev] car tu as défini tes tests dans optional-dependencies
-RUN pip install --no-cache-dir -e ".[dev]"
+RUN pip install .
 
 # 6. Copie tout le reste du code source
 COPY . .
