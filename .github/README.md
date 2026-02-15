@@ -1,5 +1,11 @@
 # 🏦 Banking Transactions API
 
+##  Application Web Streamlit
+
+Interface web métier développée séparément.
+
+📦 **Repository Streamlit** : [banking-api-streamlit](https://github.com/payebie/banking-api-streamlit)
+
 <div align="center">
 
 ![Tests](https://github.com/CamilleThauvin/projet_python_2_mba/workflows/Tests/badge.svg)
@@ -30,7 +36,7 @@
 - [Fonctionnalités](#-fonctionnalités)
 - [Technologies](#-technologies)
 - [Prérequis](#-prérequis)
-- [Installation](#-installation) 
+- [Installation](#-installation)
 - [Utilisation](#-utilisation)
 - [Documentation API](#-documentation-api)
 - [Architecture](#-architecture)
@@ -395,6 +401,7 @@ mypy banking_api --ignore-missing-imports
 
 ---
 
+
 ## 🔄 CI/CD
 
 ### GitHub Actions
@@ -498,6 +505,11 @@ Pour toute question ou problème :
 
 **⭐ Si ce projet vous a été utile, n'hésitez pas à lui donner une étoile ! ⭐**
 
-Made with ❤️ by Ines Ideche
+Made with ❤️ by Ines Hideche
 
 </div>
+- [Black Code Formatter](https://black.readthedocs.io/)
+
+---
+
+**Note** : Ces workflows sont configurés pour tourner sur Ubuntu. Pour Windows ou macOS, modifier `runs-on` dans les fichiers YAML.

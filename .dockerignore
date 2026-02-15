@@ -1,0 +1,39 @@
+﻿# Fichiers CSV de données
+data/*.csv
+*.csv
+
+# Fichiers de données
+data/*.zip
+data/*.json
+
+# Python
+__pycache__/
+*.py[cod]
+*.class
+*.so
+.Python
+pycache/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual Environment
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+
+# Tests
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Git
+.git/
+.gitignore
+
+# Documentation
+*.md

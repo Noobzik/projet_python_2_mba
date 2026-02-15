@@ -1,0 +1,17 @@
+include README.md
+include LICENSE
+include requirements.txt
+include requirements-test.txt
+include requirements-dev.txt
+include pytest.ini
+include .flake8
+include Makefile
+
+recursive-include banking_api *.py
+recursive-include tests *.py
+recursive-include tests_unittest *.py
+
+exclude data/*
+global-exclude __pycache__
+global-exclude *.py[cod]
+global-exclude .DS_Store

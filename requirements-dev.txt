@@ -1,0 +1,8 @@
+# Outils de développement et qualité de code
+flake8==7.3.0
+autopep8==2.3.2
+black==25.1.0
+isort==6.0.0
+mypy==1.17.0
+pytest==9.0.2
+pytest-cov==7.0.0

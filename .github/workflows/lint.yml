@@ -1,0 +1,47 @@
+name: Code Quality
+
+on:
+  push:
+    branches: [ main, develop, feature/* ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+
+    - name: Install linting tools
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8 black isort mypy
+
+    - name: Check code formatting with Black
+      run: |
+        black --check banking_api/
+      continue-on-error: true
+
+    - name: Check import sorting with isort
+      run: |
+        isort --check-only banking_api/
+      continue-on-error: true
+
+    - name: Lint with flake8
+      run: |
+        # Stop on Python syntax errors or undefined names
+        flake8 banking_api --count --select=E9,F63,F7,F82 --show-source --statistics
+        # Treat all other errors as warnings
+        flake8 banking_api --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+
+    - name: Type check with mypy
+      run: |
+        mypy banking_api --ignore-missing-imports
+      continue-on-error: true
