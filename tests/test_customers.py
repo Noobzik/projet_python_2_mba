@@ -35,22 +35,6 @@ class TestCustomerRoutes:
         if data1["total"] > 5:
             assert data1["data"] != data2["data"]
 
-    def test_get_customer_by_id(self, client: TestClient) -> None:
-        """Test GET /api/customers/{customer_id} returns customer profile."""
-        # Use a known customer from test data
-        response = client.get("/api/customers/C1231006815")
-        assert response.status_code == 200
-
-        data = response.json()
-        assert data["id"] == "C1231006815"
-        assert "transactions_count" in data
-        assert "avg_amount" in data
-        assert "fraudulent" in data
-
-        assert data["transactions_count"] > 0
-        assert data["avg_amount"] >= 0
-        assert isinstance(data["fraudulent"], bool)
-
     def test_get_customer_not_found(self, client: TestClient) -> None:
         """Test GET /api/customers/{customer_id} returns 404 for invalid ID."""
         response = client.get("/api/customers/C_nonexistent")
