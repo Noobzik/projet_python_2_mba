@@ -1,6 +1,6 @@
 # Banking Transactions API
 
-API REST FastAPI exposant les données de transactions bancaires fictives.
+API REST développée avec FastAPI expose et analyse des données de transactions bancaires fictives.
 
 ## Installation
 
